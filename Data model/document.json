@@ -1,0 +1,45 @@
+{
+	"locations": [{
+		"id": 1,
+		"name": "Villa Panza",
+		"photo_urls": ["photo_1", "photo_2"],
+		"latitude": 45.8252298,
+		"longitude": 8.8267149,
+		"user_id": 1,
+		"address": "Piazza Litta, 1, 21100 Varese VA"
+	}, {
+		"id": 2,
+		"name": "Cascate di Cittiglio",
+		"photo_urls": ["photo_1", "photo_2"],
+		"latitude": 45.902538,
+		"longitude": 8.6618048,
+		"user_id": 1,
+		"address": "Via Pianella, 21033 Cittiglio VA"
+	}],
+	"rates": [{
+		"id": 1,
+		"rate": 4,
+		"user_id": 1,
+		"location_id": 1,
+		"created_on": "2017-01-21 15:52:01"
+	}, {
+		"id": 2,
+		"rate": 5,
+		"user_id": 2,
+		"location_id": 1,
+		"created_on": "2017-01-21 15:52:01"
+	}],
+	"comments": [{
+		"id": 1,
+		"comment": "Posto spettacolare",
+		"user_id": 1,
+		"location_id": 1,
+		"created_on": "2017-01-21 15:52:01"
+	}, {
+		"id": 2,
+		"comment": "Posto bellissimo",
+		"user_id": 1,
+		"location_id": 2,
+		"created_on": "2017-01-21 15:55:01"
+	}]
+}

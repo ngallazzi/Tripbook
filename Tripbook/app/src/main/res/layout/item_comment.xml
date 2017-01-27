@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="@dimen/comment_list_item_padding"
+    android:paddingBottom="@dimen/comment_list_item_padding"
+    android:paddingStart="@dimen/comment_list_item_padding"
+    android:paddingEnd="@dimen/comment_list_item_padding"
+    android:gravity="center_vertical">
+    <LinearLayout
+        android:layout_width="@dimen/user_layout_width"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/civCommentAuthor"
+            android:layout_width="@dimen/user_image_radius"
+            android:layout_height="@dimen/user_image_radius"
+            android:paddingStart="@dimen/comment_list_item_padding"
+            android:paddingEnd="@dimen/comment_list_item_padding"
+            android:src="@drawable/ic_user" />
+        <TextView
+            android:id="@+id/tvAuthorName"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dummy_username" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/tvComment"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:text="@string/lorem_ipsum" />
+</LinearLayout>

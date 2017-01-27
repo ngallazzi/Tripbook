@@ -1,0 +1,15 @@
+{
+	"rates": [{
+		"id": 1,
+		"rate": 4,
+		"user_id": 1,
+		"location_id": 1,
+		"created_on": "2017-01-21 15:52:01"
+	}, {
+		"id": 2,
+		"rate": 5,
+		"user_id": 2,
+		"location_id": 1,
+		"created_on": "2017-01-21 15:52:01"
+	}]
+}

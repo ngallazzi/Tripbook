@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Tripbook</string>
+    <!-- ... -->
+    <string name="facebook_application_id" translatable="false">1842741196014907</string>
+    <!-- Facebook Application ID, prefixed by 'fb'.  Enables Chrome Custom tabs. -->
+    <string name="facebook_login_protocol_scheme" translatable="false">fb1842741196014907</string>
+    <string name="no_comments">no comments</string>
+    <string name="no_rate">no rating</string>
+    <string name="destination_name_placeholder">Lorem ipsum sit dolor amet</string>
+    <string name="image_placeholder">Image placeholder</string>
+    <string name="rate">Rate</string>
+    <string name="location_id" translatable="false">location_id</string>
+    <string name="dummy_username">Username</string>
+    <string name="vote">Votes</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui sapien, condimentum ac massa at, gravida sodales erat. Fusce sit amet massa vulputate, egestas quam at, ornare lectus. Ut tristique porttitor vehicula. Integer eget mollis enim, eget consequat arcu. Nulla facilisi. Proin sed pulvinar sem, nec convallis dui. Quisque auctor, massa non malesuada faucibus, leo turpis facilisis libero, ut consequat arcu justo id arcu. Sed convallis, lacus eu varius hendrerit, mi diam consequat ligula, eget vulputate eros erat ut quam. Phasellus placerat malesuada nisl et congue.</string>
+</resources>
