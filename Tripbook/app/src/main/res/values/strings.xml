@@ -11,6 +11,7 @@
     <string name="rate">Rate</string>
     <string name="location_id" translatable="false">location_id</string>
     <string name="comments">Comments:</string>
+    <string name="add_comment">Add a comment…</string>
     <string name="dummy_username">Username</string>
     <string name="dummy_date">1970-01-01 00:00</string>
     <string name="vote">Votes</string>

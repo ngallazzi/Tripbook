@@ -19,6 +19,7 @@ import java.util.TreeMap;
  */
 @IgnoreExtraProperties
 public class Location implements Parcelable {
+    public static final String LOCATION_TABLE_NAME = "locations";
     private final String TAG = Location.class.getSimpleName();
     public int id;
     public String address;

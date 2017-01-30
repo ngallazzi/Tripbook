@@ -3,11 +3,17 @@ package com.nikogalla.tripbook.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.Exclude;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Nicola on 2017-01-27.
  */
 
 public class Comment implements Parcelable {
+    public static final String COMMENTS_TABLE_NAME = "comments";
     public String createdAt;
     public String text;
     public String userId;
@@ -36,6 +42,14 @@ public class Comment implements Parcelable {
         }
     };
 
+    public Comment(String createdAt, String text, String userId, String userName, String userPictureUrl) {
+        this.createdAt = createdAt;
+        this.text = text;
+        this.userId = userId;
+        this.userName = userName;
+        this.userPictureUrl = userPictureUrl;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -48,5 +62,16 @@ public class Comment implements Parcelable {
         out.writeString(userId);
         out.writeString(userName);
         out.writeString(userPictureUrl);
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("createdAt", createdAt);
+        result.put("text", text);
+        result.put("userId", userId);
+        result.put("userName", userName);
+        result.put("userPictureUrl", userPictureUrl);
+        return result;
     }
 }

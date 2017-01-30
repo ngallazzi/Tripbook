@@ -8,6 +8,8 @@
     <dimen name="destination_card_height">256dp</dimen>
     <dimen name="destination_card_image_height">192dp</dimen>
     <dimen name="destination_card_title_height">64dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="comment_bar_height">48dp</dimen>
     <dimen name="user_image_stroke">2dp</dimen>
     <dimen name="user_layout_width">96dp</dimen>
     <dimen name="user_image_radius">48dp</dimen>

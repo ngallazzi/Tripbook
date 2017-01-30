@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 
 public class AroundYouActivity extends AppCompatActivity {
     private final String TAG = AroundYouActivity.class.getSimpleName();
-    private final String LOCATION_TABLE_NAME = "locations";
+
     @BindView(R.id.rvLocations) RecyclerView mRvLocations;
     @BindView(R.id.fabAddLocation) FloatingActionButton fabAddLocation;
     private LocationAdapter mLocationsAdapter;
@@ -63,7 +63,7 @@ public class AroundYouActivity extends AppCompatActivity {
     }
 
     public void getLocationsByProximity(Double longitude, Double latitude){
-        DatabaseReference ref = mDatabase.getReference(LOCATION_TABLE_NAME);
+        DatabaseReference ref = mDatabase.getReference(Location.LOCATION_TABLE_NAME);
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {

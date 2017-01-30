@@ -19,7 +19,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".AroundYouActivity" />
-        <activity android:name=".LocationDetailsActivity" android:parentActivityName=".AroundYouActivity" />
+        <activity android:name=".LocationDetailsActivity" android:parentActivityName=".AroundYouActivity"  android:launchMode="singleTop" />
+        <activity android:name=".CommentActivity" android:parentActivityName=".LocationDetailsActivity"  />
     </application>
 
 </manifest>

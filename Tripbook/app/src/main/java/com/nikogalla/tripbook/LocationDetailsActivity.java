@@ -1,11 +1,13 @@
 package com.nikogalla.tripbook;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -43,15 +45,10 @@ public class LocationDetailsActivity extends AppCompatActivity {
     RatingView rtvLocationRatings;
     @BindView(R.id.tvLocationRating)
     TextView tvLocationRating;
-    @BindView(R.id.ivLocationReviews)
-    ImageButton ivLocationReviews;
     @BindView(R.id.tvLocationDescription)
     TextView tvLocationDescription;
-    @BindView(R.id.rvLocationReviews)
-    RecyclerView rvLocationReviews;
-    private CommentAdapter mReviewAdapter;
-    private ArrayList<Comment> mCommentsArrayList;
-    private LinearLayoutManager mLayoutManager;
+    @BindView(R.id.ibAddComment)
+    ImageButton ibAddComment;
     DatabaseReference mDatabase;
 
     @Override
@@ -61,13 +58,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mContext = this;
         mLocation = getIntent().getParcelableExtra(getString(R.string.location_id));
-        mCommentsArrayList = new ArrayList<>();
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        rvLocationReviews.setLayoutManager(mLayoutManager);
-        // specify an adapter (see also next example)
-        mReviewAdapter = new CommentAdapter(mCommentsArrayList,mContext);
-        rvLocationReviews.setAdapter(mReviewAdapter);
         mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
@@ -76,11 +66,18 @@ public class LocationDetailsActivity extends AppCompatActivity {
         super.onStart();
         loadLocationPicture();
         loadLocationInfos();
-        loadLocationComments();
         rtvLocationRatings.setOnRatingChangedListener(new RatingView.OnRatingChangedListener() {
             @Override
             public void onRatingChange(float oldRating, float newRating) {
                 writeNewRate(newRating);
+            }
+        });
+        ibAddComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext,CommentActivity.class);
+                intent.putExtra(getString(R.string.location_id),mLocation);
+                startActivity(intent);
             }
         });
     }
@@ -102,14 +99,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
         }catch (Exception e){
             Log.d(TAG,"No photo for location: " + mLocation.name + " " + e.getMessage());
         }
-    }
-
-
-    private void loadLocationComments(){
-        for (Map.Entry<String,Comment> entry : mLocation.comments.entrySet()) {
-           mCommentsArrayList.add(entry.getValue());
-        }
-        mReviewAdapter.notifyDataSetChanged();
     }
 
     private void writeNewRate(float newRate){
