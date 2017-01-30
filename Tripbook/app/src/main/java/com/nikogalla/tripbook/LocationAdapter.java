@@ -84,7 +84,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     public void setImage(Location location, ViewHolder holder){
         holder.tvLocationName.setText(location.name);
         try{
-            Picasso.with(mContext).load(location.photoUrls.get(0)).into(holder.ivLocation);
+            Picasso.with(mContext).load(location.getMainPhotoUrl()).into(holder.ivLocation);
         }catch (Exception e){
             Log.d(TAG,"No photo for location: " + location.name + " " + e.getMessage());
         }

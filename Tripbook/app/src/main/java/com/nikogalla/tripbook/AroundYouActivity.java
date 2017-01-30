@@ -68,6 +68,8 @@ public class AroundYouActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Location location = dataSnapshot.getValue(Location.class);
+                Log.v(TAG,"Location key: " +  dataSnapshot.getKey());
+                location.setKey(dataSnapshot.getKey());
                 System.out.println("Location: " + location.name);
                 System.out.println("Address: " + location.address);
                 mLocationsArrayList.add(location);

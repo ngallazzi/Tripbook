@@ -5,42 +5,41 @@ import android.os.Parcelable;
 
 import com.google.firebase.database.Exclude;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Nicola on 2017-01-27.
+ * Created by Nicola on 2017-01-30.
  */
 
-public class Rate implements Parcelable {
+public class Photo implements Parcelable{
     public String createdAt;
-    public int rate;
+    public String url;
     public String userId;
 
-    public Rate() {
+    public Photo() {
     }
 
-    private Rate(Parcel in) {
+    private Photo(Parcel in) {
         createdAt = in.readString();
-        rate = in.readInt();
+        url = in.readString();
         userId = in.readString();
     }
 
-    public static final Parcelable.Creator<Rate> CREATOR
-            = new Parcelable.Creator<Rate>() {
-        public Rate createFromParcel(Parcel in) {
-            return new Rate(in);
+    public static final Parcelable.Creator<Photo> CREATOR
+            = new Parcelable.Creator<Photo>() {
+        public Photo createFromParcel(Parcel in) {
+            return new Photo(in);
         }
 
-        public Rate[] newArray(int size) {
-            return new Rate[size];
+        public Photo[] newArray(int size) {
+            return new Photo[size];
         }
     };
 
-    public Rate(int rate,String createdAt,  String userId) {
+    public Photo(String url,String createdAt,  String userId) {
         this.createdAt = createdAt;
-        this.rate = rate;
+        this.url = url;
         this.userId = userId;
     }
 
@@ -52,7 +51,7 @@ public class Rate implements Parcelable {
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(createdAt);
-        out.writeInt(rate);
+        out.writeString(url);
         out.writeString(userId);
     }
 
@@ -60,7 +59,7 @@ public class Rate implements Parcelable {
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("createdAt", createdAt);
-        result.put("rate", rate);
+        result.put("url", url);
         result.put("userId", userId);
         return result;
     }

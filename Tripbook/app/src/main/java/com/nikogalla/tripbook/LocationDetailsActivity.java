@@ -11,14 +11,27 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.ornolfr.ratingview.RatingView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.nikogalla.tripbook.models.Comment;
+import com.nikogalla.tripbook.models.Photo;
+import com.nikogalla.tripbook.models.Rate;
 import com.nikogalla.tripbook.models.Location;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.R.attr.key;
+import static com.nikogalla.tripbook.R.string.rate;
 
 public class LocationDetailsActivity extends AppCompatActivity {
     private final String TAG = LocationDetailsActivity.class.getSimpleName();
@@ -39,6 +52,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private CommentAdapter mReviewAdapter;
     private ArrayList<Comment> mCommentsArrayList;
     private LinearLayoutManager mLayoutManager;
+    DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +68,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         // specify an adapter (see also next example)
         mReviewAdapter = new CommentAdapter(mCommentsArrayList,mContext);
         rvLocationReviews.setAdapter(mReviewAdapter);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -62,6 +77,12 @@ public class LocationDetailsActivity extends AppCompatActivity {
         loadLocationPicture();
         loadLocationInfos();
         loadLocationComments();
+        rtvLocationRatings.setOnRatingChangedListener(new RatingView.OnRatingChangedListener() {
+            @Override
+            public void onRatingChange(float oldRating, float newRating) {
+                writeNewRate(newRating);
+            }
+        });
     }
 
     private void loadLocationInfos(){
@@ -76,7 +97,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
     private void loadLocationPicture(){
         try{
-            Picasso.with(mContext).load(mLocation.photoUrls.get(0)).into(ivLocationPicture);
+            String photoUrl = mLocation.getMainPhotoUrl();
+            Picasso.with(mContext).load(photoUrl).into(ivLocationPicture);
         }catch (Exception e){
             Log.d(TAG,"No photo for location: " + mLocation.name + " " + e.getMessage());
         }
@@ -84,9 +106,21 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
 
     private void loadLocationComments(){
-        for (Comment c: mLocation.comments){
-            mCommentsArrayList.add(c);
+        for (Map.Entry<String,Comment> entry : mLocation.comments.entrySet()) {
+           mCommentsArrayList.add(entry.getValue());
         }
         mReviewAdapter.notifyDataSetChanged();
+    }
+
+    private void writeNewRate(float newRate){
+        Date now = new Date();
+        String nowString = DateUtils.getUTCDateStringFromdate(now);
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Rate rateToAdd = new Rate((int) newRate,nowString, userId);
+        Map<String, Object> rateValues = rateToAdd.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        String ratesKey = mDatabase.child("rates").push().getKey();
+        childUpdates.put("/locations/" + mLocation.getKey() + "/rates/" + ratesKey,rateValues);
+        mDatabase.updateChildren(childUpdates);
     }
 }

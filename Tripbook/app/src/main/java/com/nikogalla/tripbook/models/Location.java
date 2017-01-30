@@ -6,12 +6,13 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.google.firebase.database.IgnoreExtraProperties;
-import com.google.gson.annotations.SerializedName;
 import com.nikogalla.tripbook.R;
+import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.StringTokenizer;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Nicola on 2017-01-27.
@@ -25,25 +26,22 @@ public class Location implements Parcelable {
     public Double longitude;
     public String name;
     public String description;
-    public ArrayList<String> photoUrls;
-    public ArrayList<Comment> comments;
-    public ArrayList<Rate> rates;
-
+    public Map<String,Photo> photos = new HashMap<>();
+    public Map<String,Comment> comments = new HashMap<>();
+    public Map<String,Rate> rates = new HashMap<>();
     public String userId;
+    private String key;
 
     public Location() {
     }
 
-    public Location(String address, int id, Double latitude, Double longitude, String name, String description, ArrayList<String> photoUrls,ArrayList<Comment> comments, ArrayList<Rate> rates, String userId) {
+    public Location(String address, int id, Double latitude, Double longitude, String name, String description,String userId) {
         this.address = address;
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
         this.description = description;
-        this.photoUrls = photoUrls;
-        this.comments = comments;
-        this.rates = rates;
         this.userId = userId;
     }
 
@@ -58,14 +56,51 @@ public class Location implements Parcelable {
         longitude = in.readDouble();
         name = in.readString();
         description = in.readString();
-        photoUrls = new ArrayList<String>();
-        in.readStringList(photoUrls);
-        comments = new ArrayList<>();
-        in.readTypedList(comments,Comment.CREATOR);
-        rates = new ArrayList<>();
-        in.readTypedList(rates,Rate.CREATOR);
+        readPhotoUrls(in);
+        readComments(in);
+        readRates(in);
         userId = in.readString();
+        key = in.readString();
     }
+
+    private void readPhotoUrls(Parcel in){
+        final int N = in.readInt();
+        for (int i=0; i<N; i++) {
+            String key = in.readString();
+            Photo photo = new Photo();
+            photo.createdAt = in.readString();
+            photo.url = in.readString();
+            photo.userId = in.readString();
+            photos.put(key, photo);
+        }
+    }
+
+    private void readComments(Parcel in){
+        final int N = in.readInt();
+        for (int i=0; i<N; i++) {
+            String key = in.readString();
+            Comment comment = new Comment();
+            comment.createdAt = in.readString();
+            comment.text = in.readString();
+            comment.userId = in.readString();
+            comment.userName = in.readString();
+            comment.userPictureUrl = in.readString();
+            comments.put(key, comment);
+        }
+    }
+
+    private void readRates(Parcel in){
+        final int N = in.readInt();
+        for (int i=0; i<N; i++) {
+            String key = in.readString();
+            Rate rate = new Rate();
+            rate.createdAt = in.readString();
+            rate.rate = in.readInt();
+            rate.userId = in.readString();
+            rates.put(key, rate);
+        }
+    }
+
 
     public static final Parcelable.Creator<Location> CREATOR
             = new Parcelable.Creator<Location>() {
@@ -78,6 +113,13 @@ public class Location implements Parcelable {
         }
     };
 
+    public void setKey (String key){
+        this.key = key;
+    }
+
+    public String getKey (){
+        return key;
+    }
 
     @Override
     public void writeToParcel(Parcel out, int i) {
@@ -87,19 +129,67 @@ public class Location implements Parcelable {
         out.writeDouble(longitude);
         out.writeString(name);
         out.writeString(description);
-        out.writeStringList(photoUrls);
-        out.writeTypedList(comments);
-        out.writeTypedList(rates);
+        writePhotoUrls(out);
+        writeComments(out);
+        writeRates(out);
         out.writeString(userId);
+        out.writeString(key);
+    }
+
+    private void writePhotoUrls(Parcel out){
+        final int N = photos.size();
+        out.writeInt(N);
+        if (N > 0) {
+            for (Map.Entry<String, Photo> entry : photos.entrySet()) {
+                out.writeString(entry.getKey());
+                Photo dat = entry.getValue();
+                out.writeString(dat.createdAt);
+                out.writeString(dat.url);
+                out.writeString(dat.userId);
+                // etc...
+            }
+        }
+    }
+
+    private void writeComments(Parcel out){
+        final int N = comments.size();
+        out.writeInt(N);
+        if (N > 0) {
+            for (Map.Entry<String, Comment> entry : comments.entrySet()) {
+                out.writeString(entry.getKey());
+                Comment dat = entry.getValue();
+                out.writeString(dat.createdAt);
+                out.writeString(dat.text);
+                out.writeString(dat.userId);
+                out.writeString(dat.userName);
+                out.writeString(dat.userPictureUrl);
+            }
+        }
+    }
+
+    private void writeRates(Parcel out){
+        final int N = rates.size();
+        out.writeInt(N);
+        if (N > 0) {
+            for (Map.Entry<String, Rate> entry : rates.entrySet()) {
+                out.writeString(entry.getKey());
+                Rate dat = entry.getValue();
+                out.writeString(dat.createdAt);
+                out.writeInt(dat.rate);
+                out.writeString(dat.userId);
+            }
+        }
+    }
+
+    public String getMainPhotoUrl(){
+        for (Map.Entry<String,Photo> photo : photos.entrySet()) {
+            return photo.getValue().url;
+        }
+        return null;
     }
 
     public String getRateString(Context context){
-        float locationRate;
-        int totalRateValue = 0;
-        for (Rate r: rates){
-            totalRateValue+= r.rate;
-        }
-        locationRate = Math.round(totalRateValue/rates.size());
+        float locationRate = getRate();
         String locationRateString = String.format(Locale.getDefault(),"%.1f", locationRate)
                 + "/" + String.valueOf(context.getResources().getInteger(R.integer.max_rate))
                 + " (" + String.valueOf(rates.size()) + " " + context.getString(R.string.vote) + ")";
@@ -109,12 +199,16 @@ public class Location implements Parcelable {
     public float getRate(){
         try{
             float locationRate;
-            int totalRateValue = 0;
-            for (Rate r: rates){
-                totalRateValue+= r.rate;
+            float totalRateValue = 0;
+            for (Map.Entry<String,Rate> r : rates.entrySet()) {
+                totalRateValue+= r.getValue().rate;
             }
-            locationRate = Math.round(totalRateValue/rates.size());
-            return locationRate;
+            if(totalRateValue<=0)
+                return 0;
+            else{
+                locationRate = totalRateValue/rates.size();
+                return locationRate;
+            }
         }catch (Exception e){
             Log.d(TAG,e.getMessage());
             return -1;

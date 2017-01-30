@@ -1,7 +1,10 @@
 package com.nikogalla.tripbook;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +14,14 @@ import android.widget.TextView;
 import com.nikogalla.tripbook.models.Comment;
 import com.squareup.picasso.Picasso;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static com.nikogalla.tripbook.DateUtils.getHumanReadableDateString;
 
 /**
  * Created by Nicola on 2017-01-27.
@@ -29,12 +37,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public CircleImageView civCommentAuthor;
-        public TextView tvComment,tvAuthorName;
+        public TextView tvComment,tvCommentDate;
         public ViewHolder(View v) {
             super(v);
             civCommentAuthor = (CircleImageView) v.findViewById(R.id.civCommentAuthor);
             tvComment = (TextView) v.findViewById(R.id.tvComment);
-            tvAuthorName = (TextView) v.findViewById(R.id.tvAuthorName);
+            tvCommentDate = (TextView) v.findViewById(R.id.tvCommentDate);
         }
     }
 
@@ -76,8 +84,17 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     public void setText(Comment comment, ViewHolder holder){
-        holder.tvAuthorName.setText(comment.userName);
-        holder.tvComment.setText(comment.text);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            holder.tvComment.setText(Html.fromHtml("<b>" + comment.userName + "</b> " + comment.text, Html.FROM_HTML_MODE_COMPACT));
+        }else{
+            holder.tvComment.setText(Html.fromHtml("<b>" + comment.userName + "</b> " + comment.text));
+        }
+        try{
+            String date = getHumanReadableDateString(comment.createdAt);
+            holder.tvCommentDate.setText(date);
+        }catch (Exception e){
+            Log.d(TAG,e.getMessage());
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)
