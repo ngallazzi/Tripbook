@@ -1,12 +1,14 @@
 package com.nikogalla.tripbook;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -47,6 +49,13 @@ public class AroundYouActivity extends AppCompatActivity {
         // specify an adapter (see also next example)
         mLocationsAdapter = new LocationAdapter(mLocationsArrayList,mContext);
         mRvLocations.setAdapter(mLocationsAdapter);
+        fabAddLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext,AddLocationActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

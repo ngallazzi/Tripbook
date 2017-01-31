@@ -2,4 +2,5 @@
 <resources>
     <integer name="max_rate">5</integer>
     <integer name="max_comment_lines">3</integer>
+    <integer name="min_location_description_lines">2</integer>
 </resources>

@@ -8,6 +8,7 @@
     <string name="no_rate">no rating</string>
     <string name="destination_name_placeholder">Lorem ipsum sit dolor amet</string>
     <string name="image_placeholder">Image placeholder</string>
+    <string name="add_image">Add image</string>
     <string name="rate">Rate</string>
     <string name="location_id" translatable="false">location_id</string>
     <string name="comments">Comments:</string>
@@ -16,4 +17,11 @@
     <string name="dummy_date">1970-01-01 00:00</string>
     <string name="vote">Votes</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui sapien, condimentum ac massa at, gravida sodales erat. Fusce sit amet massa vulputate, egestas quam at, ornare lectus. Ut tristique porttitor vehicula. Integer eget mollis enim, eget consequat arcu. Nulla facilisi. Proin sed pulvinar sem, nec convallis dui. Quisque auctor, massa non malesuada faucibus, leo turpis facilisis libero, ut consequat arcu justo id arcu. Sed convallis, lacus eu varius hendrerit, mi diam consequat ligula, eget vulputate eros erat ut quam. Phasellus placerat malesuada nisl et congue.</string>
+    <string name="add_description_hint">Add a description here</string>
+    <string name="add_location_name_hint">Name</string>
+    <string name="add_address_hint">Address</string>
+    <string name="address_icon">Edit address icon</string>
+    <string name="description_icon">Edit description icon</string>
+    <string name="confirm_location">Confirm location</string>
+    <string name="google_maps_api_key">AIzaSyBuvaiIFh2y2aEKQcLW3E0YVCqMuMq5m3Y</string>
 </resources>

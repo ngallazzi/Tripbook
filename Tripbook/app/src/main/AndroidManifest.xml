@@ -15,12 +15,21 @@
         <activity android:name=".SignUpActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".AroundYouActivity" />
-        <activity android:name=".LocationDetailsActivity" android:parentActivityName=".AroundYouActivity"  android:launchMode="singleTop" />
-        <activity android:name=".CommentActivity" android:parentActivityName=".LocationDetailsActivity"  />
+        <activity
+            android:name=".LocationDetailsActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".AroundYouActivity" />
+        <activity
+            android:name=".CommentActivity"
+            android:parentActivityName=".LocationDetailsActivity" />
+        <activity
+            android:name=".AddLocationActivity"
+            android:parentActivityName=".AroundYouActivity" />
     </application>
 
 </manifest>
