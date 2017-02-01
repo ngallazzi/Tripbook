@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import com.nikogalla.tripbook.R;
 import com.squareup.picasso.Picasso;
@@ -21,7 +22,6 @@ import java.util.TreeMap;
 public class Location implements Parcelable {
     public static final String LOCATION_TABLE_NAME = "locations";
     private final String TAG = Location.class.getSimpleName();
-    public int id;
     public String address;
     public Double latitude;
     public Double longitude;
@@ -36,9 +36,8 @@ public class Location implements Parcelable {
     public Location() {
     }
 
-    public Location(String address, int id, Double latitude, Double longitude, String name, String description,String userId) {
+    public Location(String address, Double latitude, Double longitude, String name, String description,String userId) {
         this.address = address;
-        this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
@@ -51,7 +50,6 @@ public class Location implements Parcelable {
     }
 
     private Location(Parcel in) {
-        id = in.readInt();
         address = in.readString();
         latitude = in.readDouble();
         longitude = in.readDouble();
@@ -124,7 +122,6 @@ public class Location implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int i) {
-        out.writeInt(id);
         out.writeString(address);
         out.writeDouble(latitude);
         out.writeDouble(longitude);
@@ -214,5 +211,25 @@ public class Location implements Parcelable {
             Log.d(TAG,e.getMessage());
             return -1;
         }
+    }
+
+    public Map<String, Photo> getPhotos() {
+        return photos;
+    }
+
+    public void setPhotos(Map<String, Photo> photos) {
+        this.photos = photos;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("address", address);
+        result.put("latitude", latitude);
+        result.put("longitude", longitude);
+        result.put("name", name);
+        result.put("description", description);
+        result.put("userId", userId);
+        return result;
     }
 }

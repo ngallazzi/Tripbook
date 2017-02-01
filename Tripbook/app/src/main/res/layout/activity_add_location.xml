@@ -6,82 +6,90 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.nikogalla.tripbook.AddLocationActivity">
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <ImageView
-            android:id="@+id/ivAddPicture"
-            android:layout_width="match_parent"
-            android:contentDescription="@string/add_image"
-            android:layout_height="@dimen/destination_card_height"
-            android:src="@drawable/camera_placeholder"
-            android:scaleType="center" />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider" />
+        android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin">
-
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/ivAddPicture"
+                android:layout_width="match_parent"
+                android:contentDescription="@string/add_image"
+                android:layout_height="@dimen/destination_card_height"
+                android:src="@drawable/camera_placeholder"
+                android:scaleType="center" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:layout_marginBottom="@dimen/activity_vertical_margin">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/address_icon"
-                    android:src="@drawable/ic_edit" />
-                <EditText
-                    android:id="@+id/etLocationName"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/activity_horizontal_margin"
-                    android:lines="1"
-                    android:hint="@string/add_location_name_hint" />
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/address_icon"
-                    android:src="@drawable/ic_address" />
+                android:orientation="vertical"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin">
 
-                <com.seatgeek.placesautocomplete.PlacesAutocompleteTextView
-                    android:id="@+id/patvLocationAddress"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/activity_horizontal_margin"
-                    android:hint="@string/add_address_hint"
-                    app:pacv_googleMapsApiKey="@string/google_maps_api_key"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/address_icon"
-                    android:src="@drawable/ic_about" />
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/address_icon"
+                        android:src="@drawable/ic_edit" />
+                    <EditText
+                        android:inputType="text"
+                        android:id="@+id/etLocationName"
+                        android:imeOptions="actionNext"
+                        android:nextFocusDown="@+id/patvLocationAddress"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:hint="@string/add_location_name_hint" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/address_icon"
+                        android:src="@drawable/ic_address" />
 
-                <EditText
-                    android:id="@+id/etLocationDescription"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/activity_horizontal_margin"
-                    android:minLines="@integer/min_location_description_lines"
-                    android:hint="@string/add_description_hint" />
+                    <com.seatgeek.placesautocomplete.PlacesAutocompleteTextView
+                        android:inputType="text"
+                        android:id="@+id/patvLocationAddress"
+                        android:nextFocusDown="@+id/etLocationDescription"
+                        android:imeOptions="actionNext"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:hint="@string/add_address_hint"
+                        app:pacv_googleMapsApiKey="@string/google_maps_api_key"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/address_icon"
+                        android:src="@drawable/ic_about" />
+                    <EditText
+                        android:id="@+id/etLocationDescription"
+                        android:inputType="text"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:hint="@string/add_description_hint" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
 </android.support.design.widget.CoordinatorLayout>
