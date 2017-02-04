@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class Comment implements Parcelable {
     public static final String COMMENTS_TABLE_NAME = "comments";
+    public String key;
     public String createdAt;
     public String text;
     public String userId;
@@ -73,5 +74,13 @@ public class Comment implements Parcelable {
         result.put("userName", userName);
         result.put("userPictureUrl", userPictureUrl);
         return result;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

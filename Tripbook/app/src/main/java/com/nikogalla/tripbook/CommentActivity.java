@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -37,6 +38,8 @@ import butterknife.ButterKnife;
 
 public class CommentActivity extends AppCompatActivity {
     private static final String TAG = CommentActivity.class.getSimpleName();
+    @BindView(R.id.tbAddComment)
+    Toolbar tbAddComment;
     @BindView(R.id.rvLocationComments)
     RecyclerView rvLocationComments;
     @BindView(R.id.etAddComment)
@@ -58,8 +61,12 @@ public class CommentActivity extends AppCompatActivity {
         mCommentsArrayList = new ArrayList<>();
         mContext = this;
         ButterKnife.bind(this);
+        tbAddComment.setTitle(getString(R.string.add_comment));
+        setSupportActionBar(tbAddComment);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager.setStackFromEnd(true);
         rvLocationComments.setLayoutManager(mLayoutManager);
         // specify an adapter (see also next example)
         mCommentsAdapter = new CommentAdapter(mCommentsArrayList,mContext);
@@ -70,7 +77,7 @@ public class CommentActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        loadLocationComments();
+        mCommentsArrayList.clear();
         ibAddComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,9 +90,9 @@ public class CommentActivity extends AppCompatActivity {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Comment comment = dataSnapshot.getValue(Comment.class);
                 Log.v(TAG,comment.text);
-                mCommentsArrayList.add(0,comment);
+                mCommentsArrayList.add(comment);
                 mCommentsAdapter.notifyDataSetChanged();
-
+                rvLocationComments.smoothScrollToPosition(mCommentsAdapter.getItemCount() - 1);
                 hideKeyboard();
             }
 
@@ -109,6 +116,7 @@ public class CommentActivity extends AppCompatActivity {
 
             }
         });
+
     }
 
     public void hideKeyboard(){
@@ -124,14 +132,6 @@ public class CommentActivity extends AppCompatActivity {
         }catch (Exception e){
 
         }
-    }
-
-
-    private void loadLocationComments(){
-        for (Map.Entry<String,Comment> entry : mLocation.comments.entrySet()) {
-            mCommentsArrayList.add(entry.getValue());
-        }
-        mCommentsAdapter.notifyDataSetChanged();
     }
 
     private void writeNewComment(String text){

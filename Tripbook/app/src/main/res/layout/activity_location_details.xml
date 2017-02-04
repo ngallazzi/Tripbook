@@ -6,77 +6,132 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.nikogalla.tripbook.LocationDetailsActivity"
-    android:orientation="vertical">
-
-    <ScrollView
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:fitsSystemWindows="true">
+        <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingStart="@dimen/activity_horizontal_margin"
-            android:paddingEnd="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            app:contentScrim="@color/primary"
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleMarginStart="48dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            android:fitsSystemWindows="true">
             <ImageView
                 android:id="@+id/ivLocationPicture"
                 android:layout_width="match_parent"
-                android:layout_height="256dp"
+                android:layout_height="@dimen/destination_card_height"
                 android:src="@drawable/camera_placeholder"
                 android:scaleType="centerCrop" />
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/tbLocationDetails"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:layout_collapseMode="pin">
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:layout_height="wrap_content">
-                    <com.github.ornolfr.ratingview.RatingView
-                        android:id="@+id/rvLocationRatings"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:drawable_empty="@drawable/ic_star_empty"
-                        app:drawable_filled="@drawable/ic_star_filled"
-                        app:drawable_half="@drawable/ic_star_half"
-                        app:drawable_margin="4dp"
-                        app:drawable_size="24dp"
-                        app:is_indicator="false"
-                        app:max_count="5"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-                        app:rating="0" />
-                    />
-                    <TextView
-                        android:id="@+id/tvLocationRating"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/no_rate" />
-                    <ImageButton
-                        android:id="@+id/ibAddComment"
-                        android:background="@color/tw__transparent"
-                        android:src="@drawable/ic_comments_green"
-                        android:contentDescription="@string/add_comment"
-                        android:layout_width="@dimen/comment_bar_height"
-                        android:layout_height="@dimen/comment_bar_height" />
-                </LinearLayout>
-
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/destination_title_vertical_padding"
+                android:paddingBottom="@dimen/destination_title_vertical_padding"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/address_icon"
+                    android:layout_marginEnd="@dimen/destination_title_horizontal_padding"
+                    android:src="@drawable/ic_address" />
+                <TextView
+                    android:id="@+id/tvLocationAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/add_address_hint" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/destination_title_vertical_padding"
+                android:paddingBottom="@dimen/destination_title_vertical_padding"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+                <LinearLayout
+                    android:id="@+id/llRates"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:src="@drawable/ic_rate_orange"
+                        android:contentDescription="@string/add_rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/destination_title_horizontal_padding"
+                        />
+                    <TextView
+                        android:id="@+id/tvLocationRating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no_rate"
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/llComments"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/ibAddComment"
+                        android:src="@drawable/ic_comments_green"
+                        android:contentDescription="@string/add_comment"
+                        android:layout_marginEnd="@dimen/destination_title_horizontal_padding"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/tvLocationComments"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no_comments" />
+                </LinearLayout>
+                </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:background="@color/light_grey"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <TextView
                     android:id="@+id/tvLocationDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/lorem_ipsum"
-                    android:paddingBottom="@dimen/activity_vertical_margin"
-                    />
+                    android:text="@string/lorem_ipsum" />
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 </android.support.design.widget.CoordinatorLayout>

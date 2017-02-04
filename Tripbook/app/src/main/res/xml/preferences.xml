@@ -1,0 +1,7 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:defaultValue="@string/def_distance_in_miles"
+        android:inputType="number"
+        android:key="@string/preference_distance_range_id"
+        android:title="@string/preference_distance_range" />
+</PreferenceScreen>

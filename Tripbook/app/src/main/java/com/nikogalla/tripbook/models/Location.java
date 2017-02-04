@@ -22,6 +22,7 @@ import java.util.TreeMap;
 public class Location implements Parcelable {
     public static final String LOCATION_TABLE_NAME = "locations";
     private final String TAG = Location.class.getSimpleName();
+    private String key;
     public String address;
     public Double latitude;
     public Double longitude;
@@ -31,7 +32,6 @@ public class Location implements Parcelable {
     public Map<String,Comment> comments = new HashMap<>();
     public Map<String,Rate> rates = new HashMap<>();
     public String userId;
-    private String key;
 
     public Location() {
     }
@@ -230,6 +230,7 @@ public class Location implements Parcelable {
         result.put("name", name);
         result.put("description", description);
         result.put("userId", userId);
+        result.put("photos", photos);
         return result;
     }
 }

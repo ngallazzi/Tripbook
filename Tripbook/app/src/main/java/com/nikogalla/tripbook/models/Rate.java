@@ -14,9 +14,13 @@ import java.util.Map;
  */
 
 public class Rate implements Parcelable {
+    public static final String RATES_TABLE_NAME = "rates";
+    public String key;
     public String createdAt;
     public int rate;
     public String userId;
+    public String userName;
+    public String userPictureUrl;
 
     public Rate() {
     }
@@ -25,6 +29,8 @@ public class Rate implements Parcelable {
         createdAt = in.readString();
         rate = in.readInt();
         userId = in.readString();
+        userName = in.readString();
+        userPictureUrl = in.readString();
     }
 
     public static final Parcelable.Creator<Rate> CREATOR
@@ -38,10 +44,12 @@ public class Rate implements Parcelable {
         }
     };
 
-    public Rate(int rate,String createdAt,  String userId) {
+    public Rate(int rate,String createdAt,  String userId, String userName,String userPictureUrl) {
         this.createdAt = createdAt;
         this.rate = rate;
         this.userId = userId;
+        this.userName = userName;
+        this.userPictureUrl = userPictureUrl;
     }
 
     @Override
@@ -54,6 +62,8 @@ public class Rate implements Parcelable {
         out.writeString(createdAt);
         out.writeInt(rate);
         out.writeString(userId);
+        out.writeString(userName);
+        out.writeString(userPictureUrl);
     }
 
     @Exclude
@@ -62,6 +72,16 @@ public class Rate implements Parcelable {
         result.put("createdAt", createdAt);
         result.put("rate", rate);
         result.put("userId", userId);
+        result.put("userName", userName);
+        result.put("userPictureUrl", userPictureUrl);
         return result;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

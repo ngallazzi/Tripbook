@@ -6,10 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.ornolfr.ratingview.RatingView;
@@ -39,17 +41,24 @@ public class LocationDetailsActivity extends AppCompatActivity {
     private final String TAG = LocationDetailsActivity.class.getSimpleName();
     private Context mContext;
     private Location mLocation;
+    @BindView(R.id.tbLocationDetails)
+    Toolbar tbLocationDetails;
     @BindView(R.id.ivLocationPicture)
     ImageView ivLocationPicture;
-    @BindView(R.id.rvLocationRatings)
-    RatingView rtvLocationRatings;
     @BindView(R.id.tvLocationRating)
     TextView tvLocationRating;
+    @BindView(R.id.tvLocationComments)
+    TextView tvLocationComments;
     @BindView(R.id.tvLocationDescription)
     TextView tvLocationDescription;
-    @BindView(R.id.ibAddComment)
-    ImageButton ibAddComment;
+    @BindView(R.id.tvLocationAddress)
+    TextView tvLocationAddress;
+    @BindView(R.id.llComments)
+    LinearLayout llComments;
+    @BindView(R.id.llRates)
+    LinearLayout llRates;
     DatabaseReference mDatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,20 +68,27 @@ public class LocationDetailsActivity extends AppCompatActivity {
         mContext = this;
         mLocation = getIntent().getParcelableExtra(getString(R.string.location_id));
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        tbLocationDetails.setTitle(mLocation.name);
+        setSupportActionBar(tbLocationDetails);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        tvLocationAddress.setText(mLocation.address);
         loadLocationPicture();
         loadLocationInfos();
-        rtvLocationRatings.setOnRatingChangedListener(new RatingView.OnRatingChangedListener() {
+        llRates.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onRatingChange(float oldRating, float newRating) {
-                writeNewRate(newRating);
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext,RateActivity.class);
+                intent.putExtra(getString(R.string.location_id),mLocation);
+                startActivity(intent);
             }
         });
-        ibAddComment.setOnClickListener(new View.OnClickListener() {
+        llComments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext,CommentActivity.class);
@@ -89,6 +105,9 @@ public class LocationDetailsActivity extends AppCompatActivity {
         if (rating>0){
             tvLocationRating.setText(mLocation.getRateString(mContext));
         }
+        if (mLocation.comments.size()>0){
+            tvLocationComments.setText(mLocation.comments.size() + " " + mContext.getString(R.string.comments));
+        }
 
     }
 
@@ -99,17 +118,5 @@ public class LocationDetailsActivity extends AppCompatActivity {
         }catch (Exception e){
             Log.d(TAG,"No photo for location: " + mLocation.name + " " + e.getMessage());
         }
-    }
-
-    private void writeNewRate(float newRate){
-        Date now = new Date();
-        String nowString = DateUtils.getUTCDateStringFromdate(now);
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        Rate rateToAdd = new Rate((int) newRate,nowString, userId);
-        Map<String, Object> rateValues = rateToAdd.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        String ratesKey = mDatabase.child("rates").push().getKey();
-        childUpdates.put("/locations/" + mLocation.getKey() + "/rates/" + ratesKey,rateValues);
-        mDatabase.updateChildren(childUpdates);
     }
 }

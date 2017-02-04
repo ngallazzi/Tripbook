@@ -1,6 +1,7 @@
 package com.nikogalla.tripbook;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,24 +10,32 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.method.KeyListener;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.facebook.internal.Utility;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.models.Photo;
 import com.seatgeek.placesautocomplete.DetailsCallback;
@@ -35,9 +44,11 @@ import com.seatgeek.placesautocomplete.PlacesAutocompleteTextView;
 import com.seatgeek.placesautocomplete.model.Place;
 import com.seatgeek.placesautocomplete.model.PlaceDetails;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,10 +56,17 @@ import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnTextChanged;
+
+import static android.support.design.widget.Snackbar.Callback.DISMISS_EVENT_ACTION;
 
 public class AddLocationActivity extends AppCompatActivity {
     private final String TAG = AddLocationActivity.class.getSimpleName();
-    static final int REQUEST_TAKE_PHOTO = 1;
+    private final String FIREBASE_BUCKET = "gs://tripbook-aa611.appspot.com/";
+    static final int REQUEST_SELECT_PHOTO = 1;
+    static final int REQUEST_IMAGE_CAPTURE = 2;
+    @BindView(R.id.tbAddlocation)
+    Toolbar tbAddlocation;
     @BindView(R.id.clAddLocationActivityContainer)
     CoordinatorLayout clAddLocationActivityContainer;
     @BindView(R.id.ivAddPicture)
@@ -63,7 +81,12 @@ public class AddLocationActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private Double mLocationLatitude;
     private Double mLocationLongitude;
+    private boolean mPictureIsSet,mLocationNameIsSet,mLocationCoordinatesAreSet,mLocationDescriptionIsSet;
     private Context mContext;
+    private FirebaseStorage mStorage;
+    StorageReference mStorageRef;
+    StorageReference mImagesRef;
+    MenuItem mConfirmMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +94,13 @@ public class AddLocationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_location);
         ButterKnife.bind(this);
         mContext = this;
+        tbAddlocation.setTitle(getString(R.string.add_location));
+        setSupportActionBar(tbAddlocation);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        mStorage = FirebaseStorage.getInstance();
+        mStorageRef = mStorage.getReferenceFromUrl(FIREBASE_BUCKET);
+        mImagesRef = mStorageRef.child("images");
     }
 
     @Override
@@ -88,35 +117,120 @@ public class AddLocationActivity extends AppCompatActivity {
                                 mLocationLongitude = placeDetails.geometry.location.lng;
                                 Log.v(TAG,"Longitude:" + placeDetails.geometry.location.lng);
                                 Log.v(TAG,"Latitude:" + placeDetails.geometry.location.lat);
+                                mLocationCoordinatesAreSet = true;
+                                if (isLocationInsertComplete()){
+                                    mConfirmMenuItem.setEnabled(true);
+                                }
                             }
 
                             @Override
                             public void onFailure(Throwable throwable) {
-
+                                mLocationCoordinatesAreSet = false;
                             }
                         });
                         // do something awesome with the selected place
                     }
                 }
         );
-        ivAddPicture.setOnClickListener(new View.OnClickListener() {
+        patvLocationAddress.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View v) {
-                dispatchTakePictureIntent();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mLocationCoordinatesAreSet = false;
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
+        etLocationName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mLocationNameIsSet = false;
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count>0){
+                    mLocationNameIsSet = true;
+                    if (isLocationInsertComplete()){
+                        mConfirmMenuItem.setEnabled(true);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        etLocationDescription.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                mLocationDescriptionIsSet = false;
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (count>0){
+                    mLocationDescriptionIsSet = true;
+                    if (isLocationInsertComplete()){
+                        mConfirmMenuItem.setEnabled(true);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        ivAddPicture.setOnClickListener(new View.OnClickListener() {
+            final CharSequence[] items = { getString(R.string.take_photo), getString(R.string.select_from_gallery), getString(R.string.cancel)};
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(AddLocationActivity.this);
+                builder.setTitle(getString(R.string.choose_location_photo));
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (items[item].equals(getString(R.string.take_photo))) {
+                            dispatchTakePictureIntent();
+                        } else if (items[item].equals(getString(R.string.select_from_gallery))) {
+                            dispatchPictureFromGalleryIntent();
+                        } else if (items[item].equals(getString(R.string.cancel))) {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+                builder.show();
+            }
+        });
+    }
+
+
+    private boolean isLocationInsertComplete(){
+        if (mPictureIsSet && mLocationNameIsSet && mLocationCoordinatesAreSet && mLocationDescriptionIsSet){
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_add_location_activity, menu);
+        inflater.inflate(R.menu.add_location, menu);
         // Get the SearchView and set the searchable configuration
-        MenuItem item = menu.findItem(R.id.action_print);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        mConfirmMenuItem = menu.findItem(R.id.action_confirm_location);
+        mConfirmMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                writeNewLocation(String.valueOf(patvLocationAddress.getText()),String.valueOf(etLocationDescription.getText()),
+                uploadImageAndWriteLocation(String.valueOf(patvLocationAddress.getText()),String.valueOf(etLocationDescription.getText()),
                         mLocationLatitude,mLocationLongitude,String.valueOf(etLocationName.getText()));
                 return false;
             }
@@ -124,7 +238,11 @@ public class AddLocationActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-
+    private void dispatchPictureFromGalleryIntent() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(intent,REQUEST_SELECT_PHOTO);
+    }
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -136,7 +254,6 @@ public class AddLocationActivity extends AppCompatActivity {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
-                Log.d(TAG,"Error occurred while creating the file");
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
@@ -144,32 +261,16 @@ public class AddLocationActivity extends AppCompatActivity {
                         "com.nikogalla.tripbook.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+        if ((requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) || (requestCode == REQUEST_SELECT_PHOTO && resultCode == RESULT_OK)) {
             setPic();
         }
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
     }
 
     private void setPic() {
@@ -193,21 +294,77 @@ public class AddLocationActivity extends AppCompatActivity {
         bmOptions.inPurgeable = true;
 
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+
         ivAddPicture.setImageBitmap(bitmap);
         ivAddPicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        mPictureIsSet = true;
+        if (isLocationInsertComplete()){
+            mConfirmMenuItem.setEnabled(true);
+        }
     }
 
-    private void writeNewLocation(String address, String description, Double latitude,Double longitude, String name) {
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String key = mDatabase.child("locations").push().getKey();
-        Location location = new Location(address, latitude, longitude, name, description,userId);
-        Map<String, Object> locationValues = location.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/locations/" + key, locationValues);
-        mDatabase.updateChildren(childUpdates);
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
-    public void uploadImage(){
+    public void uploadImageAndWriteLocation(final String address, final String description, final Double latitude, final Double longitude, final String name){
+        // Create a reference to "mountains.jpg"
+        String locationName = etLocationName.getText().toString();
+        locationName = locationName.replaceAll("[^a-zA-Z0-9.-]", "_");
+        StorageReference locationRef = mImagesRef.child(locationName);
+        // Get the data from an ImageView as bytes
+        ivAddPicture.setDrawingCacheEnabled(true);
+        ivAddPicture.buildDrawingCache();
+        Bitmap bitmap = ivAddPicture.getDrawingCache();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
 
+        UploadTask uploadTask = locationRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                String locationKey = mDatabase.child("locations").push().getKey();
+                Location location = new Location(address, latitude, longitude, name, description,userId);
+                Date now = new Date();
+                Photo photo = new Photo(downloadUrl.toString(),DateUtils.getUTCDateStringFromdate(now),userId);
+                HashMap<String,Photo> photoHashMap = new HashMap<String, Photo>();
+                photoHashMap.put(locationKey,photo);
+                location.setPhotos(photoHashMap);
+                Map<String, Object> locationValues = location.toMap();
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put("/locations/" + locationKey, locationValues);
+                mDatabase.updateChildren(childUpdates);
+                Snackbar snackbar = StatusSnackBars.getStatusSnackBar(getString(R.string.add_location_successful),clAddLocationActivityContainer);
+                snackbar.addCallback(new Snackbar.Callback(){
+                    @Override
+                    public void onDismissed(Snackbar transientBottomBar, int event) {
+                        super.onDismissed(transientBottomBar, event);
+                        finish();
+                    }
+                });
+                snackbar.show();
+            }
+        });
     }
 }

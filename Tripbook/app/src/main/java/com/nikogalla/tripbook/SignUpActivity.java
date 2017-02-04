@@ -22,7 +22,7 @@ public class SignUpActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // setContentView(R.layout.activity_sign_up);
+//        setContentView(R.layout.activity_sign_up);
         FirebaseAuth auth = FirebaseAuth.getInstance();
         mContext = this;
         if (auth.getCurrentUser() != null) {
@@ -39,10 +39,11 @@ public class SignUpActivity extends AppCompatActivity {
         startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
-                        .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                                new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
+                        .setProviders(Arrays.asList(new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build(),
                                 new AuthUI.IdpConfig.Builder(AuthUI.FACEBOOK_PROVIDER).build()))
-                        .setTheme(R.style.AppTheme)
+                        .setTheme(R.style.Splash)
+                        .setIsSmartLockEnabled(false)
+                        .setLogo(R.drawable.tripbook_logo_splash)
                         .build(),
                 RC_SIGN_IN);
     }

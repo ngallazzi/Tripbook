@@ -13,6 +13,7 @@ import java.util.Map;
  */
 
 public class Photo implements Parcelable{
+    public String key;
     public String createdAt;
     public String url;
     public String userId;
@@ -62,5 +63,13 @@ public class Photo implements Parcelable{
         result.put("url", url);
         result.put("userId", userId);
         return result;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
