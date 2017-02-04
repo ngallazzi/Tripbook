@@ -43,8 +43,10 @@ import com.seatgeek.placesautocomplete.OnPlaceSelectedListener;
 import com.seatgeek.placesautocomplete.PlacesAutocompleteTextView;
 import com.seatgeek.placesautocomplete.model.Place;
 import com.seatgeek.placesautocomplete.model.PlaceDetails;
+import com.squareup.picasso.Picasso;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -268,8 +270,22 @@ public class AddLocationActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if ((requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) || (requestCode == REQUEST_SELECT_PHOTO && resultCode == RESULT_OK)) {
+        if ((requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)) {
             setPic();
+        }
+        else if ((requestCode == REQUEST_SELECT_PHOTO && resultCode == RESULT_OK)){
+            Uri selectedImage = data.getData();
+            try{
+                Picasso.with(mContext).load(selectedImage).into(ivAddPicture);
+                ivAddPicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                mPictureIsSet = true;
+                if (isLocationInsertComplete()){
+                    mConfirmMenuItem.setEnabled(true);
+                }
+            }catch (Exception e){
+
+            }
+            // Log.d(TAG, String.valueOf(bitmap));
         }
     }
 
@@ -294,13 +310,19 @@ public class AddLocationActivity extends AppCompatActivity {
         bmOptions.inPurgeable = true;
 
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-
         ivAddPicture.setImageBitmap(bitmap);
         ivAddPicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
         mPictureIsSet = true;
         if (isLocationInsertComplete()){
             mConfirmMenuItem.setEnabled(true);
         }
+    }
+
+    private byte[] getCompressedBitmapByteArray(Bitmap origBitmap){
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        origBitmap.compress(Bitmap.CompressFormat.JPEG,75,out);
+        Log.v(TAG,"Bitmap size: " + out.size());
+        return out.toByteArray();
     }
 
     private File createImageFile() throws IOException {
@@ -328,10 +350,7 @@ public class AddLocationActivity extends AppCompatActivity {
         ivAddPicture.setDrawingCacheEnabled(true);
         ivAddPicture.buildDrawingCache();
         Bitmap bitmap = ivAddPicture.getDrawingCache();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-
+        byte[] data = getCompressedBitmapByteArray(bitmap);
         UploadTask uploadTask = locationRef.putBytes(data);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
