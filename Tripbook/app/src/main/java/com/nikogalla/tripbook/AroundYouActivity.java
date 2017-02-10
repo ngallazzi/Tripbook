@@ -1,15 +1,13 @@
 package com.nikogalla.tripbook;
 
-import android.*;
 import android.Manifest;
 import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -22,10 +20,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.network.connectionclass.ConnectionClassManager;
-import com.facebook.network.connectionclass.ConnectionQuality;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -35,23 +32,35 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.nikogalla.tripbook.data.FirebaseHelper;
 import com.nikogalla.tripbook.data.LocationContract;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.prefs.PreferencesUtils;
 import com.nikogalla.tripbook.prefs.SettingsActivity;
+import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
+import com.nikogalla.tripbook.utils.LocationUtils;
+import com.nikogalla.tripbook.utils.StatusSnackBars;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AroundYouActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private final String TAG = AroundYouActivity.class.getSimpleName();
+    @BindView(R.id.clActivityAroundYouContainer)
+    CoordinatorLayout clActivityAroundYouContainer;
     @BindView(R.id.tbAroundYou)
     Toolbar tbAroundYou;
-    @BindView(R.id.rvLocations) RecyclerView mRvLocations;
-    @BindView(R.id.fabAddLocation) FloatingActionButton fabAddLocation;
+    @BindView(R.id.rvLocations)
+    RecyclerView mRvLocations;
+    @BindView(R.id.tvNoLocationsFound)
+    TextView tvNoLocationsFound;
+    @BindView(R.id.fabAddLocation)
+    FloatingActionButton fabAddLocation;
     private LocationAdapter mLocationsAdapter;
     private ArrayList<Location> mLocationsArrayList;
     private LinearLayoutManager mLayoutManager;
@@ -59,9 +68,6 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     private Context mContext;
     private final int LOCATION_REQUEST_ID = 1;
 
-    public static final String ACCOUNT = "dummyaccount";
-    // Instance fields
-    Account mAccount;
     GoogleApiClient mGoogleApiClient;
     android.location.Location mGpsLocation;
 
@@ -71,11 +77,9 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         setContentView(R.layout.activity_around_you);
         mContext = this;
         ButterKnife.bind(this);
-        // Create the dummy account
-        mAccount = CreateSyncAccount(this);
         tbAroundYou.setTitle(getString(R.string.app_name) + " - " +getString(R.string.around_you));
         setSupportActionBar(tbAroundYou);
-        mDatabase = FirebaseDatabase.getInstance();
+        mDatabase = FirebaseHelper.getDatabase();
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRvLocations.setHasFixedSize(true);
@@ -101,6 +105,33 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                     .addApi(LocationServices.API)
                     .build();
         }
+        mRvLocations.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0 ||dy<0 && fabAddLocation.isShown())
+                {
+                    fabAddLocation.hide();
+                }
+            }
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE && !isLastItemDisplaying())
+                {
+                    fabAddLocation.show();
+                }
+
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+    }
+
+    private boolean isLastItemDisplaying() {
+        if (mRvLocations.getAdapter().getItemCount() != 0) {
+            int lastVisibleItemPosition = ((LinearLayoutManager) mRvLocations.getLayoutManager()).findLastCompletelyVisibleItemPosition();
+            if (lastVisibleItemPosition != RecyclerView.NO_POSITION && lastVisibleItemPosition == mRvLocations.getAdapter().getItemCount() - 1)
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -121,46 +152,57 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         super.onPause();
     }
 
-    public void getLocations(){
-        ConnectionQuality cq = ConnectionClassManager.getInstance().getCurrentBandwidthQuality();
-        if (cq.ordinal() >= ConnectionQuality.MODERATE.ordinal()){
-            setUpFirebaseDataDownload();
-        }else{
-            // get local data
-        }
-    }
 
-    public void setUpFirebaseDataDownload(){
+    public void getLocations(){
         mLocationsArrayList.clear();
         DatabaseReference ref = mDatabase.getReference(Location.LOCATION_TABLE_NAME);
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Location location = dataSnapshot.getValue(Location.class);
-                if (isLocationInRange(location)){
-                    location.setKey(dataSnapshot.getKey());
+                int distance = LocationUtils.getLocationDistanceFromMyLocation(location,mGpsLocation);
+                location.distance = distance;
+                if (LocationUtils.isLocationDistanceInRange(distance,mContext)){
                     mLocationsArrayList.add(location);
-                    mLocationsAdapter.notifyDataSetChanged();
-                    LocationContract.LocationEntry.saveLocationLocally(location,mContext);
-                    LocationContract.CommentEntry.saveLocationCommentsLocally(location,mContext);
-                    LocationContract.PhotoEntry.saveLocationPhotosLocally(location,mContext);
-                    LocationContract.RateEntry.saveLocationRatesLocally(location,mContext);
+                    location.setKey(dataSnapshot.getKey());
                 }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                Log.v(TAG,"Child changed");
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                Log.v(TAG,"Child removed");
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Log.v(TAG,"Child moved");
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clActivityAroundYouContainer).show();
+            }
+        });
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Done with the initial loading
+               if (mLocationsArrayList.size() ==0){
+                   tvNoLocationsFound.setVisibility(View.VISIBLE);
+                   mRvLocations.setVisibility(View.GONE);
+               }else{
+                   Collections.sort(mLocationsArrayList,new LocationUtils.LocationDistanceComparator());
+                   // Saving location locally for widget
+                   LocationContract.LocationEntry.saveLocationsLocally(mLocationsArrayList,mContext);
+                   TripbookSyncAdapter.updateWidgets(mContext);
+                   mLocationsAdapter.notifyDataSetChanged();
+                   tvNoLocationsFound.setVisibility(View.GONE);
+                   mRvLocations.setVisibility(View.VISIBLE);
+               }
             }
 
             @Override
@@ -170,19 +212,7 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         });
     }
 
-    private boolean isLocationInRange(Location loc){
-        android.location.Location targetLocation = new android.location.Location("");//provider name is unecessary
-        targetLocation.setLatitude(loc.latitude);//your coords of course
-        targetLocation.setLongitude(loc.longitude);
-        float distance = mGpsLocation.distanceTo(targetLocation);
-        int preferredDistance = new PreferencesUtils(mContext).getPreferredUserRange()*1000;
-        if (distance<= preferredDistance){
-            Log.v(TAG,"Location: " + loc.name);
-            Log.v(TAG,"Distance: " + distance + " mt");
-            return true;
-        }
-        return false;
-    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -211,6 +241,15 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                 return false;
             }
         });
+        MenuItem itemMapLayout = menu.findItem(R.id.action_map_layout);
+        itemMapLayout.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(mContext,AroundYouMapActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -219,35 +258,6 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         finish();
         Intent intent = new Intent(mContext, SignUpActivity.class);
         startActivity(intent);
-    }
-
-    public static Account CreateSyncAccount(Context context) {
-        // Create the account type and default account
-        final String ACCOUNT_TYPE = context.getString(R.string.sync_account_type);
-        Account newAccount = new Account(
-                ACCOUNT, ACCOUNT_TYPE);
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(
-                        ACCOUNT_SERVICE);
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-        } else {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-        }
-        return newAccount;
     }
 
     @Override
@@ -259,10 +269,12 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mGpsLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            TripbookSyncAdapter.initializeSyncAdapter(mContext);
             getLocations();
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST_ID);
         }
+        // Test, remove
     }
 
     @Override
@@ -293,4 +305,6 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
+
+
 }

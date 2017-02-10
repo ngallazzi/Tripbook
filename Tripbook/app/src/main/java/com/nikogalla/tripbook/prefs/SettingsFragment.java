@@ -50,7 +50,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.matches(getString(R.string.preference_distance_range_id))){
+        if (key.matches(getString(R.string.preference_distance_range_key))){
             getActivity().finish();
         }
     }

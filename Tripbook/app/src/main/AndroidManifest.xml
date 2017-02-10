@@ -3,16 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.nikogalla.tripbook">
 
-    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- sync adapter permissions -->
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission
         android:name="android.permission.READ_SYNC_SETTINGS"/>
     <uses-permission
         android:name="android.permission.WRITE_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="18"  />
-
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -24,21 +26,23 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:supportsRtl">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDPKiHU1fA19ZMWv_06vOAX6s9rJA46ojo"/>
         <activity
             android:name=".SignUpActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".AroundYouActivity" />
+        <activity android:name=".AroundYouMapActivity" android:parentActivityName=".AroundYouActivity" />
         <activity
             android:name=".LocationDetailsActivity"
-            android:launchMode="singleTop"
-            android:parentActivityName=".AroundYouActivity" />
+            android:launchMode="singleTop" />
         <activity
             android:name=".CommentActivity"
             android:parentActivityName=".LocationDetailsActivity" />
@@ -57,31 +61,45 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+        <!-- Sync adapter -->
         <provider
             android:authorities="@string/content_authority"
             android:name=".data.LocationProvider"
             android:exported="false"
             android:syncable="true" />
+        <!-- SyncAdapter's dummy authentication service -->
         <service
-            android:name=".sync.AuthenticatorService">
+            android:name=".sync.TripbookAuthenticatorService">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator"/>
+                <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
-        <!-- Sync service -->
+        <!-- The SyncAdapter service -->
         <service
-            android:name=".sync.SyncService"
-            android:exported="true"
-            android:process=":sync">
+            android:name=".sync.TripbookSyncService"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.content.SyncAdapter"/>
+                <action android:name="android.content.SyncAdapter" />
             </intent-filter>
-            <meta-data android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_adapter" />
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
         </service>
+        <!-- Location Widget -->
+        <service android:name=".widget.WidgetLocationNearbyRemoteViewsService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver android:name=".widget.WidgetLocationNearbyProvider" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.nikogalla.tripbook.ACTION_DATA_UPDATED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_location_nearby" />
+        </receiver>
     </application>
 
 </manifest>

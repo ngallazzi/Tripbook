@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llItemLocationContainer"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:theme="@style/LocationTitle"
+    android:layout_marginBottom="@dimen/activity_vertical_margin">
+
+    <ImageView
+        android:id="@+id/ivLocation"
+        android:contentDescription="@string/image_placeholder"
+        android:layout_width="@dimen/info_window_width"
+        android:layout_height="@dimen/info_window_image_height"
+        android:scaleType="centerCrop"
+        android:src="@drawable/camera_placeholder" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:background="@color/primary"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin">
+            <TextView
+                android:id="@+id/tvLocationName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingTop="@dimen/destination_title_vertical_padding"
+                android:paddingBottom="@dimen/destination_title_vertical_padding"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/destination_name_placeholder" />
+            <TextView
+                android:id="@+id/tvLocationAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingBottom="@dimen/destination_title_vertical_padding"
+                android:text="@string/add_address_hint" />
+    </LinearLayout>
+</LinearLayout>

@@ -4,18 +4,15 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import static com.facebook.FacebookSdk.getApplicationContext;
-
 /**
- * Created by Nicola on 2017-02-03.
+ * Created by Nicola on 2017-02-10.
  */
 
-public class SyncService extends Service {
+public class TripbookSyncService extends Service {
     // Storage for an instance of the sync adapter
-    private static SyncAdapter sSyncAdapter = null;
+    private static TripbookSyncAdapter sSyncAdapter = null;
     // Object to use as a thread-safe lock
     private static final Object sSyncAdapterLock = new Object();
-
     /*
      * Instantiate the sync adapter object.
      */
@@ -28,21 +25,21 @@ public class SyncService extends Service {
          */
         synchronized (sSyncAdapterLock) {
             if (sSyncAdapter == null) {
-                sSyncAdapter = new SyncAdapter(getApplicationContext(), true);
+                sSyncAdapter = new TripbookSyncAdapter(getApplicationContext(), true);
             }
         }
     }
-
     /**
      * Return an object that allows the system to invoke
      * the sync adapter.
+     *
      */
     @Override
     public IBinder onBind(Intent intent) {
         /*
          * Get the object that allows external processes
          * to call onPerformSync(). The object is created
-         * in the base class code when the SyncAdapter
+         * in the base class code when the TripbookSyncAdapter
          * constructors call super()
          */
         return sSyncAdapter.getSyncAdapterBinder();

@@ -11,15 +11,16 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.ornolfr.ratingview.RatingView;
-import com.nikogalla.tripbook.models.Comment;
 import com.nikogalla.tripbook.models.Rate;
+import com.nikogalla.tripbook.utils.NetworkUtils;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.nikogalla.tripbook.DateUtils.getHumanReadableDateString;
+import static com.nikogalla.tripbook.utils.DateUtils.getHumanReadableDateString;
 
 /**
  * Created by Nicola on 2017-01-27.
@@ -76,10 +77,11 @@ public class RateAdapter extends RecyclerView.Adapter<RateAdapter.ViewHolder> {
     }
 
     public void setImage(Rate rate, ViewHolder holder){
-        try{
+        if (NetworkUtils.isOnline(mContext)){
             Picasso.with(mContext).load(rate.userPictureUrl).into(holder.civRateAuthor);
-        }catch (Exception e){
-            Log.d(TAG,"No photo for user: " + rate.userId + " " + e.getMessage());
+        }else{
+            Picasso.with(mContext).load(rate.userPictureUrl).networkPolicy(NetworkPolicy.OFFLINE).into(holder.civRateAuthor);
+            Log.v(TAG,"no connection, loading local user image");
         }
     }
 

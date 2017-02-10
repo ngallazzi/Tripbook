@@ -4,13 +4,16 @@
     <string name="facebook_application_id" translatable="false">1842741196014907</string>
     <!-- Facebook Application ID, prefixed by 'fb'.  Enables Chrome Custom tabs. -->
     <string name="facebook_login_protocol_scheme" translatable="false">fb1842741196014907</string>
+    <string name="no_locations">No location found around you, add the first location with the button below or change range from preferences</string>
+    <string name="widget_logo">Widget logo</string>
     <string name="no_comments">no comments</string>
     <string name="no_rate">no rating</string>
-    <string name="destination_name_placeholder">Lorem ipsum sit dolor amet</string>
-    <string name="image_placeholder">Image placeholder</string>
+    <string name="destination_name_placeholder">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui sapien, condimentum ac massa at, gravida sodales erat. Fusce sit amet massa vulputate,</string>
+    <string name="image_placeholder">Location image</string>
     <string name="add_image">Add image</string>
     <string name="rate">Rate</string>
     <string name="location_id" translatable="false">location_id</string>
+    <string name="location_name_id" translatable="false">location_name_id</string>
     <string name="comments">Comments:</string>
     <string name="add_comment">Add a comment</string>
     <string name="add_rate">Add a rate</string>
@@ -31,17 +34,24 @@
     <string name="add_rate_successful">Thanks, rate added successfully!</string>
     <string name="around_you">Around you</string>
     <string name="add_location">Add a location</string>
+    <string name="map_layout">Map layout</string>
     <string name="preferences">Preferences</string>
-    <string name="preference_distance_range">Distance range from your position (miles)</string>
-    <string name="preference_distance_range_id">range_id</string>
-    <string name="def_distance_in_miles">50</string>
+    <string name="preference_distance_range">Distance range from your position</string>
+    <string name="preference_distance_range_key">range_id</string>
+    <string name="preference_unit_key_title">Preferred distance unit</string>
+    <string name="preference_distance_unit_key">unit_id</string>
+    <string name="def_distance">50</string>
     <string name="choose_location_photo">Choose a source</string>
     <string name="take_photo">Take photo</string>
     <string name="cancel">Cancel</string>
     <string name="select_from_gallery">Select from gallery</string>
     <!-- Account type (for sync-adapter authenticator) -->
-    <!-- SyncAdapter related -->
+    <!-- TripbookSyncAdapter related -->
     <string name="sync_account_type">tripbook.nikogalla.com</string>
     <string name="content_authority">com.nikogalla.tripbook</string>
     <string name="alert_localization">Please, allow localization to have locations around you</string>
+    <!-- Sharing -->
+    <string name="share_location">Share location</string>
+    <string name="share_text">I\'m visiting %1$s with Tripbook!</string>
+    <string name="share_intent">Select how to share your location:</string>
 </resources>

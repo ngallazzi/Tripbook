@@ -5,7 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -16,79 +18,97 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.MimeTypeMap;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-import com.facebook.internal.Utility;
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlacePhotoMetadata;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadataResult;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.nikogalla.tripbook.data.FirebaseHelper;
+import com.nikogalla.tripbook.models.Comment;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.models.Photo;
-import com.seatgeek.placesautocomplete.DetailsCallback;
-import com.seatgeek.placesautocomplete.OnPlaceSelectedListener;
-import com.seatgeek.placesautocomplete.PlacesAutocompleteTextView;
-import com.seatgeek.placesautocomplete.model.Place;
-import com.seatgeek.placesautocomplete.model.PlaceDetails;
+import com.nikogalla.tripbook.models.Rate;
+import com.nikogalla.tripbook.utils.DateUtils;
+import com.nikogalla.tripbook.utils.StatusSnackBars;
 import com.squareup.picasso.Picasso;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnTextChanged;
 
-import static android.support.design.widget.Snackbar.Callback.DISMISS_EVENT_ACTION;
-
-public class AddLocationActivity extends AppCompatActivity {
+public class AddLocationActivity extends AppCompatActivity implements OnConnectionFailedListener, Validator.ValidationListener {
     private final String TAG = AddLocationActivity.class.getSimpleName();
     private final String FIREBASE_BUCKET = "gs://tripbook-aa611.appspot.com/";
-    static final int REQUEST_SELECT_PHOTO = 1;
-    static final int REQUEST_IMAGE_CAPTURE = 2;
+    static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    static final int REQUEST_SELECT_PHOTO = 2;
+    static final int REQUEST_IMAGE_CAPTURE = 3;
     @BindView(R.id.tbAddlocation)
     Toolbar tbAddlocation;
     @BindView(R.id.clAddLocationActivityContainer)
     CoordinatorLayout clAddLocationActivityContainer;
     @BindView(R.id.ivAddPicture)
     ImageView ivAddPicture;
+
+    @NotEmpty
     @BindView(R.id.etLocationName)
     EditText etLocationName;
+
+    @NotEmpty
+    @BindView(R.id.etLocationAddress)
+    EditText etLocationAddress;
+
+    @NotEmpty
     @BindView(R.id.etLocationDescription)
     EditText etLocationDescription;
-    @BindView(R.id.patvLocationAddress)
-    PlacesAutocompleteTextView patvLocationAddress;
+    @BindView(R.id.cpvUpload)
+    CircularProgressView cpvUpload;
+
     String mCurrentPhotoPath;
     private DatabaseReference mDatabase;
-    private Double mLocationLatitude;
-    private Double mLocationLongitude;
-    private boolean mPictureIsSet,mLocationNameIsSet,mLocationCoordinatesAreSet,mLocationDescriptionIsSet;
     private Context mContext;
     private FirebaseStorage mStorage;
     StorageReference mStorageRef;
     StorageReference mImagesRef;
     MenuItem mConfirmMenuItem;
+    private GoogleApiClient mGoogleApiClient;
+    Place mPlace;
+    Validator mValidator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,99 +119,40 @@ public class AddLocationActivity extends AppCompatActivity {
         tbAddlocation.setTitle(getString(R.string.add_location));
         setSupportActionBar(tbAddlocation);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDatabase = FirebaseHelper.getDatabase().getReference();
         mStorage = FirebaseStorage.getInstance();
         mStorageRef = mStorage.getReferenceFromUrl(FIREBASE_BUCKET);
         mImagesRef = mStorageRef.child("images");
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this, this)
+                .build();
+        mValidator = new Validator(this);
+        mValidator.setValidationListener(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        patvLocationAddress.setOnPlaceSelectedListener(
-                new OnPlaceSelectedListener() {
-                    @Override
-                    public void onPlaceSelected(final Place place) {
-                        patvLocationAddress.getDetailsFor(place, new DetailsCallback() {
-                            @Override
-                            public void onSuccess(PlaceDetails placeDetails) {
-                                mLocationLatitude = placeDetails.geometry.location.lat;
-                                mLocationLongitude = placeDetails.geometry.location.lng;
-                                Log.v(TAG,"Longitude:" + placeDetails.geometry.location.lng);
-                                Log.v(TAG,"Latitude:" + placeDetails.geometry.location.lat);
-                                mLocationCoordinatesAreSet = true;
-                                if (isLocationInsertComplete()){
-                                    mConfirmMenuItem.setEnabled(true);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Throwable throwable) {
-                                mLocationCoordinatesAreSet = false;
-                            }
-                        });
-                        // do something awesome with the selected place
-                    }
-                }
-        );
-        patvLocationAddress.addTextChangedListener(new TextWatcher() {
+        etLocationName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                mLocationCoordinatesAreSet = false;
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        etLocationName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                mLocationNameIsSet = false;
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count>0){
-                    mLocationNameIsSet = true;
-                    if (isLocationInsertComplete()){
-                        mConfirmMenuItem.setEnabled(true);
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus){
+                    try {
+                        Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                                        .build(AddLocationActivity.this);
+                        startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                    } catch (GooglePlayServicesRepairableException e) {
+                        StatusSnackBars.getErrorSnackBar(getString(R.string.unable_to_find_places),clAddLocationActivityContainer).show();
+                    } catch (GooglePlayServicesNotAvailableException e) {
+                        StatusSnackBars.getErrorSnackBar(getString(R.string.google_play_services_unavailable),clAddLocationActivityContainer).show();
                     }
                 }
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
         });
-        etLocationDescription.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                mLocationDescriptionIsSet = false;
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (count>0){
-                    mLocationDescriptionIsSet = true;
-                    if (isLocationInsertComplete()){
-                        mConfirmMenuItem.setEnabled(true);
-                    }
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
         ivAddPicture.setOnClickListener(new View.OnClickListener() {
             final CharSequence[] items = { getString(R.string.take_photo), getString(R.string.select_from_gallery), getString(R.string.cancel)};
             @Override
@@ -215,14 +176,6 @@ public class AddLocationActivity extends AppCompatActivity {
         });
     }
 
-
-    private boolean isLocationInsertComplete(){
-        if (mPictureIsSet && mLocationNameIsSet && mLocationCoordinatesAreSet && mLocationDescriptionIsSet){
-            return true;
-        }
-        return false;
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -232,8 +185,7 @@ public class AddLocationActivity extends AppCompatActivity {
         mConfirmMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                uploadImageAndWriteLocation(String.valueOf(patvLocationAddress.getText()),String.valueOf(etLocationDescription.getText()),
-                        mLocationLatitude,mLocationLongitude,String.valueOf(etLocationName.getText()));
+                mValidator.validate();
                 return false;
             }
         });
@@ -278,14 +230,96 @@ public class AddLocationActivity extends AppCompatActivity {
             try{
                 Picasso.with(mContext).load(selectedImage).into(ivAddPicture);
                 ivAddPicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                mPictureIsSet = true;
-                if (isLocationInsertComplete()){
-                    mConfirmMenuItem.setEnabled(true);
-                }
             }catch (Exception e){
 
             }
             // Log.d(TAG, String.valueOf(bitmap));
+        }
+        else if ((requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE)){
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                mPlace = place;
+                etLocationName.setText(mPlace.getName());
+                etLocationAddress.setText(mPlace.getAddress());
+                Log.i(TAG, "Place: " + place.getName());
+                Drawable curDrawable = ivAddPicture.getDrawable();
+                if (mCurrentPhotoPath == null){
+                   new GetPlacePhotos().execute(mPlace);
+                }
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                StatusSnackBars.getErrorSnackBar(getString(R.string.unable_to_find_places) + ", status: " + status,clAddLocationActivityContainer).show();
+                Log.i(TAG, status.getStatusMessage());
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
+    }
+
+    @Override
+    public void onValidationSucceeded() {
+
+        hideKeyboard();
+        uploadImageAndWriteLocation(mPlace.getAddress().toString(),String.valueOf(etLocationDescription.getText()),
+                mPlace.getLatLng().latitude,mPlace.getLatLng().longitude,mPlace.getName().toString());
+    }
+
+    public void hideKeyboard(){
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    @Override
+    public void onValidationFailed(List<ValidationError> errors) {
+        for (ValidationError error : errors) {
+            View view = error.getView();
+            String message = error.getCollatedErrorMessage(this);
+
+            // Display error messages ;)
+            if (view instanceof EditText) {
+                ((EditText) view).setError(message);
+            } else {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private class GetPlacePhotos extends AsyncTask<Place, Integer, Bitmap> {
+        protected Bitmap doInBackground(Place... places) {
+            Place place = places[0];
+            PlacePhotoMetadataResult result = Places.GeoDataApi.getPlacePhotos(mGoogleApiClient, place.getId()).await();
+            if (result != null && result.getStatus().isSuccess()) {
+                try{
+                    PlacePhotoMetadataBuffer photoMetadataBuffer = result.getPhotoMetadata();
+                    // Get the first photo in the list.
+                    PlacePhotoMetadata photo = photoMetadataBuffer.get(0);
+                    // Get a full-size bitmap for the photo.
+                    Bitmap image = photo.getPhoto(mGoogleApiClient).await().getBitmap();
+                    photoMetadataBuffer.release();
+                    return image;
+                }catch (Exception e){
+                    Log.d(TAG,"Error retrieving picture for place :" + e.getMessage());
+                    return null;
+                }
+            }
+           return null;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        protected void onPostExecute(Bitmap bitmap) {
+            if (bitmap!=null){
+                ivAddPicture.setImageBitmap(bitmap);
+                ivAddPicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            }else{
+                Bitmap icon = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.camera_placeholder);
+                ivAddPicture.setImageBitmap(icon);
+            }
         }
     }
 
@@ -312,15 +346,11 @@ public class AddLocationActivity extends AppCompatActivity {
         Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         ivAddPicture.setImageBitmap(bitmap);
         ivAddPicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        mPictureIsSet = true;
-        if (isLocationInsertComplete()){
-            mConfirmMenuItem.setEnabled(true);
-        }
     }
 
     private byte[] getCompressedBitmapByteArray(Bitmap origBitmap){
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        origBitmap.compress(Bitmap.CompressFormat.JPEG,75,out);
+        origBitmap.compress(Bitmap.CompressFormat.JPEG,45,out);
         Log.v(TAG,"Bitmap size: " + out.size());
         return out.toByteArray();
     }
@@ -343,7 +373,7 @@ public class AddLocationActivity extends AppCompatActivity {
 
     public void uploadImageAndWriteLocation(final String address, final String description, final Double latitude, final Double longitude, final String name){
         // Create a reference to "mountains.jpg"
-        String locationName = etLocationName.getText().toString();
+        String locationName = mPlace.getName().toString();
         locationName = locationName.replaceAll("[^a-zA-Z0-9.-]", "_");
         StorageReference locationRef = mImagesRef.child(locationName);
         // Get the data from an ImageView as bytes
@@ -352,10 +382,12 @@ public class AddLocationActivity extends AppCompatActivity {
         Bitmap bitmap = ivAddPicture.getDrawingCache();
         byte[] data = getCompressedBitmapByteArray(bitmap);
         UploadTask uploadTask = locationRef.putBytes(data);
+        cpvUpload.setVisibility(View.VISIBLE);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle unsuccessful uploads
+                StatusSnackBars.getErrorSnackBar(getString(R.string.add_location_error),clAddLocationActivityContainer).show();
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -364,16 +396,22 @@ public class AddLocationActivity extends AppCompatActivity {
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 String locationKey = mDatabase.child("locations").push().getKey();
-                Location location = new Location(address, latitude, longitude, name, description,userId);
+                Location location = new Location(locationKey,address, latitude, longitude, name, description,userId);
                 Date now = new Date();
-                Photo photo = new Photo(downloadUrl.toString(),DateUtils.getUTCDateStringFromdate(now),userId);
+                Photo photo = new Photo(downloadUrl.toString(), DateUtils.getUTCDateStringFromdate(now),userId);
                 HashMap<String,Photo> photoHashMap = new HashMap<String, Photo>();
                 photoHashMap.put(locationKey,photo);
                 location.setPhotos(photoHashMap);
+                HashMap<String,Comment> commentsHashMap = new HashMap<String, Comment>();
+                location.setComments(commentsHashMap);
+                HashMap<String,Rate> ratesHashMap = new HashMap<String, Rate>();
+                location.setRates(ratesHashMap);
+
                 Map<String, Object> locationValues = location.toMap();
                 Map<String, Object> childUpdates = new HashMap<>();
                 childUpdates.put("/locations/" + locationKey, locationValues);
                 mDatabase.updateChildren(childUpdates);
+                cpvUpload.setVisibility(View.GONE);
                 Snackbar snackbar = StatusSnackBars.getStatusSnackBar(getString(R.string.add_location_successful),clAddLocationActivityContainer);
                 snackbar.addCallback(new Snackbar.Callback(){
                     @Override
@@ -386,4 +424,11 @@ public class AddLocationActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG,"Unable to initialize location api");
+    }
+
+
 }

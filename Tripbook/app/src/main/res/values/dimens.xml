@@ -14,4 +14,15 @@
     <dimen name="user_image_stroke">2dp</dimen>
     <dimen name="user_layout_width">96dp</dimen>
     <dimen name="user_image_radius">48dp</dimen>
+    <dimen name="sharing_button_margin_top">-192dp</dimen>
+
+    <dimen name="widget_default_width">180dp</dimen>
+    <dimen name="widget_default_height">180dp</dimen>
+    <dimen name="widget_image_size">48dp</dimen>
+    <dimen name="widget_icons_size">20dp</dimen>
+
+    <dimen name="info_window_width">160dp</dimen>
+    <dimen name="info_window_image_height">112dp</dimen>
+    <!-- Progress square bar -->
+    <dimen name="progress_bar_size">40dp</dimen>
 </resources>

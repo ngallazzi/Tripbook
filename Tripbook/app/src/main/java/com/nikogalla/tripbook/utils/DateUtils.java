@@ -1,4 +1,4 @@
-package com.nikogalla.tripbook;
+package com.nikogalla.tripbook.utils;
 
 import android.util.Log;
 

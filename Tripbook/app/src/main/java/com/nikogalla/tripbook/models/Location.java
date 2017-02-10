@@ -22,7 +22,7 @@ import java.util.TreeMap;
 public class Location implements Parcelable {
     public static final String LOCATION_TABLE_NAME = "locations";
     private final String TAG = Location.class.getSimpleName();
-    private String key;
+    public String key;
     public String address;
     public Double latitude;
     public Double longitude;
@@ -32,11 +32,13 @@ public class Location implements Parcelable {
     public Map<String,Comment> comments = new HashMap<>();
     public Map<String,Rate> rates = new HashMap<>();
     public String userId;
+    public int distance;
 
     public Location() {
     }
 
-    public Location(String address, Double latitude, Double longitude, String name, String description,String userId) {
+    public Location(String key, String address, Double latitude, Double longitude, String name, String description,String userId) {
+        this.key = key;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -50,6 +52,7 @@ public class Location implements Parcelable {
     }
 
     private Location(Parcel in) {
+        key = in.readString();
         address = in.readString();
         latitude = in.readDouble();
         longitude = in.readDouble();
@@ -122,6 +125,7 @@ public class Location implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int i) {
+        out.writeString(key);
         out.writeString(address);
         out.writeDouble(latitude);
         out.writeDouble(longitude);
@@ -194,6 +198,13 @@ public class Location implements Parcelable {
                 ;
         return locationRateString;
     }
+
+    public static String getRateString(Context context, float locationRate){
+        String locationRateString = String.format(Locale.getDefault(),"%.1f", locationRate)
+                + "/" + String.valueOf(context.getResources().getInteger(R.integer.max_rate));
+        return locationRateString;
+    }
+
     public float getRate(){
         try{
             float locationRate;
@@ -224,6 +235,7 @@ public class Location implements Parcelable {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
+        result.put("key", key);
         result.put("address", address);
         result.put("latitude", latitude);
         result.put("longitude", longitude);
@@ -231,6 +243,24 @@ public class Location implements Parcelable {
         result.put("description", description);
         result.put("userId", userId);
         result.put("photos", photos);
+        result.put("comments", comments);
+        result.put("rates", rates);
         return result;
+    }
+
+    public Map<String, Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Map<String, Comment> comments) {
+        this.comments = comments;
+    }
+
+    public Map<String, Rate> getRates() {
+        return rates;
+    }
+
+    public void setRates(Map<String, Rate> rates) {
+        this.rates = rates;
     }
 }

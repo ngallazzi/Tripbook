@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.nikogalla.tripbook.models.Location;
+
 /**
  * Created by Nicola on 2017-02-03.
  */
@@ -47,23 +49,23 @@ public class LocationProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, LocationContract.PATH_LOCATION, LOCATION);
-        matcher.addURI(authority, LocationContract.PATH_LOCATION + "/*", LOCATION_WITH_LOCATION_KEY);
-        matcher.addURI(authority, LocationContract.PATH_LOCATION + "/*/*", LOCATION_WITH_COORDINATES);
-
-        matcher.addURI(authority, LocationContract.PATH_COMMENT, COMMENT);
-        matcher.addURI(authority, LocationContract.PATH_COMMENT + "/*", COMMENT_WITH_LOCATION_KEY);
-        matcher.addURI(authority, LocationContract.PATH_PHOTO, PHOTO);
-        matcher.addURI(authority, LocationContract.PATH_PHOTO + "/*", PHOTO_WITH_LOCATION_KEY);
-        matcher.addURI(authority, LocationContract.PATH_RATE, RATE);
-        matcher.addURI(authority, LocationContract.PATH_RATE + "/*", RATE_WITH_LOCATION_KEY);
-
         return matcher;
     }
 
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        Cursor retCursor;
+        switch (sUriMatcher.match(uri)) {
+            case LOCATION: {
+                retCursor = mOpenHelper.getReadableDatabase().query(LocationContract.LocationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        retCursor.setNotificationUri(getContext().getContentResolver(),uri);
+        return retCursor;
     }
 
     @Nullable
@@ -76,16 +78,6 @@ public class LocationProvider extends ContentProvider {
             // Student: Uncomment and fill out these two cases
             case LOCATION:
                 return LocationContract.LocationEntry.CONTENT_TYPE;
-            case LOCATION_WITH_LOCATION_KEY:
-                return LocationContract.LocationEntry.CONTENT_ITEM_TYPE;
-            case LOCATION_WITH_COORDINATES:
-                return LocationContract.LocationEntry.CONTENT_TYPE;
-            case COMMENT_WITH_LOCATION_KEY:
-                return LocationContract.CommentEntry.CONTENT_TYPE;
-            case PHOTO_WITH_LOCATION_KEY:
-                return LocationContract.PhotoEntry.CONTENT_TYPE;
-            case RATE_WITH_LOCATION_KEY:
-                return LocationContract.RateEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -107,30 +99,6 @@ public class LocationProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
-            case COMMENT: {
-                long _id = db.insert(LocationContract.CommentEntry.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = LocationContract.CommentEntry.buildCommentUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                break;
-            }
-            case PHOTO: {
-                long _id = db.insert(LocationContract.PhotoEntry.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = LocationContract.LocationEntry.buildLocationUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                break;
-            }
-            case RATE: {
-                long _id = db.insert(LocationContract.RateEntry.TABLE_NAME, null, values);
-                if (_id > 0)
-                    returnUri = LocationContract.LocationEntry.buildLocationUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                break;
-            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -140,12 +108,56 @@ public class LocationProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsDeleted;
+        // this makes delete all rows return the number of rows deleted
+        if ( null == selection) selection = "1";
+        switch (match) {
+            case LOCATION: {
+                rowsDeleted = db.delete(LocationContract.LocationEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        // A null value deletes all rows.  In my implementation of this, I only notified
+        // the uri listeners (using the content resolver) if the rowsDeleted != 0 or the selection
+        // is null.
+        // Oh, and you should notify the listeners here.
+        if (rowsDeleted != 0){
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        // Student: return the actual rows deleted
+        return rowsDeleted;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        // Using the uriMatcher to match the INVENTARY and BADGE URI's we are going to
+        // handle.  If it doesn't match these, throw an UnsupportedOperationException.
+        final int match = sUriMatcher.match(uri);
+        int rowsUpdated;
+        // this makes delete all rows return the number of rows deleted
+        if ( null == selection) selection = "1";
+        switch (match) {
+            case LOCATION: {
+                rowsUpdated = db.update(LocationContract.LocationEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        // Student: A null value deletes all rows.  In my implementation of this, I only notified
+        // the uri listeners (using the content resolver) if the rowsDeleted != 0 or the selection
+        // is null.
+        // Oh, and you should notify the listeners here.
+        if (rowsUpdated != 0){
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        // Student: return the actual rows deleted
+        return rowsUpdated;
     }
 
     @Override
@@ -159,10 +171,7 @@ public class LocationProvider extends ContentProvider {
                 try {
                     for (ContentValues value : values) {
                         long _idLocation = db.insert(LocationContract.LocationEntry.TABLE_NAME, null, value);
-                        long _idComments = db.insert(LocationContract.CommentEntry.TABLE_NAME, null, value);
-                        long _idPhotos = db.insert(LocationContract.PhotoEntry.TABLE_NAME, null, value);
-                        long _idRates = db.insert(LocationContract.RateEntry.TABLE_NAME, null, value);
-                        if (_idLocation != -1 && _idComments != -1 && _idPhotos !=-1 && _idRates != -1) {
+                        if (_idLocation != -1) {
                             returnCount++;
                         }
                     }

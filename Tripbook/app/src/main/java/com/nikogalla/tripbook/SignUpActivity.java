@@ -1,9 +1,15 @@
 package com.nikogalla.tripbook;
 
+import android.accounts.Account;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SyncRequest;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.firebase.ui.auth.AuthUI;
@@ -11,14 +17,19 @@ import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.ResultCodes;
 import com.google.firebase.auth.FirebaseAuth;
+import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
 
 import java.util.Arrays;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends FragmentActivity {
     // Choose an arbitrary request code value
     private static final int RC_SIGN_IN = 123;
     private static final String TAG = SignUpActivity.class.getSimpleName();
     private Context mContext;
+    // Global variables
+    // A content resolver for accessing the provider
+    ContentResolver mResolver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,7 +37,9 @@ public class SignUpActivity extends AppCompatActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         mContext = this;
         if (auth.getCurrentUser() != null) {
-            // already signed in
+            // Turn on periodic sync
+            // Get the content resolver for your app
+            mResolver = getContentResolver();
             Intent intent = new Intent(mContext,AroundYouActivity.class);
             startActivity(intent);
         } else {

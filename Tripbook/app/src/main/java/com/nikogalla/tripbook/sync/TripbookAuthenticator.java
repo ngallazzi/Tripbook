@@ -8,22 +8,23 @@ import android.content.Context;
 import android.os.Bundle;
 
 /**
- * Created by Nicola on 2017-02-03.
+ * Created by Nicola on 2017-02-10.
  */
 
-public class Authenticator  extends AbstractAccountAuthenticator {
-    public Authenticator(Context context) {
+public class TripbookAuthenticator extends AbstractAccountAuthenticator {
+    // Simple constructor
+    public TripbookAuthenticator(Context context) {
         super(context);
     }
 
-    // No properties to edit.
+    // Editing properties is not supported
     @Override
     public Bundle editProperties(
             AccountAuthenticatorResponse r, String s) {
         throw new UnsupportedOperationException();
     }
 
-    // Because we're not actually adding an account to the device, just return null.
+    // Don't add additional accounts
     @Override
     public Bundle addAccount(
             AccountAuthenticatorResponse r,

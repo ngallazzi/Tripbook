@@ -24,15 +24,20 @@ public class PreferencesUtils {
     }
 
     public int getPreferredUserRange(){
-        String defDistance = mContext.getString(R.string.def_distance_in_miles);
+        String defDistance = mContext.getString(R.string.def_distance);
         int defDistanceInt = Integer.valueOf(defDistance);
         try{
-            String prefDistance = mPreferences.getString(mContext.getString(R.string.preference_distance_range_id),"");
+            String prefDistance = mPreferences.getString(mContext.getString(R.string.preference_distance_range_key),"");
             int intValueDistance = Integer.valueOf(prefDistance);
             return intValueDistance;
         }catch (Exception e ){
             Log.e(TAG,e.getMessage());
         }
         return defDistanceInt;
+    }
+
+    public String getPreferredDistanceUnit(){
+        String prefDistance = mPreferences.getString(mContext.getString(R.string.preference_distance_unit_key),"km");
+        return prefDistance;
     }
 }

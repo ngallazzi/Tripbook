@@ -12,4 +12,11 @@
         android:orderInCategory="101"
         android:title="@string/action_logout"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_map_layout"
+        android:orderInCategory="103"
+        android:title="@string/map_layout"
+        android:icon="@drawable/ic_map"
+        app:showAsAction="ifRoom"
+        />
 </menu>

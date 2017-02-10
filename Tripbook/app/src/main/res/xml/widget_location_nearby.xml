@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:initialLayout="@layout/widget_locations_nearby"
+    android:minHeight="@dimen/widget_default_height"
+    android:minWidth="@dimen/widget_default_width"
+    android:previewImage="@drawable/camera_placeholder"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="0"
+    tools:ignore="UnusedAttribute" />

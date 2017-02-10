@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,16 +11,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.nikogalla.tripbook.models.Comment;
+import com.nikogalla.tripbook.utils.NetworkUtils;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.Date;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.nikogalla.tripbook.DateUtils.getHumanReadableDateString;
+import static com.nikogalla.tripbook.utils.DateUtils.getHumanReadableDateString;
 
 /**
  * Created by Nicola on 2017-01-27.
@@ -76,10 +74,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     public void setImage(Comment comment, ViewHolder holder){
-        try{
+        if (NetworkUtils.isOnline(mContext)){
             Picasso.with(mContext).load(comment.userPictureUrl).into(holder.civCommentAuthor);
-        }catch (Exception e){
-            Log.d(TAG,"No photo for user: " + comment.userId + " " + e.getMessage());
+        }else{
+            Picasso.with(mContext).load(comment.userPictureUrl).networkPolicy(NetworkPolicy.OFFLINE).into(holder.civCommentAuthor);
+            Log.v(TAG,"no connection, loading local user image");
         }
     }
 

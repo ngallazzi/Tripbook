@@ -20,9 +20,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.nikogalla.tripbook.data.FirebaseHelper;
 import com.nikogalla.tripbook.models.Comment;
 import com.nikogalla.tripbook.models.Location;
-import com.nikogalla.tripbook.models.Rate;
+import com.nikogalla.tripbook.utils.DateUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,7 +72,7 @@ public class CommentActivity extends AppCompatActivity {
         // specify an adapter (see also next example)
         mCommentsAdapter = new CommentAdapter(mCommentsArrayList,mContext);
         rvLocationComments.setAdapter(mCommentsAdapter);
-        mDatabase = FirebaseDatabase.getInstance();
+        mDatabase = FirebaseHelper.getDatabase();
     }
 
     @Override
