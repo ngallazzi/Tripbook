@@ -25,6 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@color/primary_text"
             android:paddingBottom="@dimen/comment_list_item_padding"
             android:text="@string/add_location_name_hint" />
         <LinearLayout
@@ -35,41 +36,41 @@
                 android:id="@+id/ivLocationDistance"
                 android:layout_width="@dimen/widget_icons_size"
                 android:layout_height="@dimen/widget_icons_size"
-                android:layout_marginEnd="@dimen/comment_list_item_padding"
+                android:layout_marginEnd="@dimen/widget_base_margin"
                 android:src="@drawable/ic_address" />
             <TextView
                 android:id="@+id/tvLocationDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="100km"
+                android:textColor="@color/secondary_text"
                 android:lines="1"
-                android:layout_marginEnd="@dimen/comment_list_item_padding" />
+                android:layout_marginEnd="@dimen/widget_base_margin" />
             <ImageView
                 android:id="@+id/ivLocationComments"
                 android:layout_width="@dimen/widget_icons_size"
                 android:layout_height="@dimen/widget_icons_size"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginEnd="@dimen/widget_base_margin"
                 android:src="@drawable/ic_comments_green" />
             <TextView
                 android:id="@+id/tvLocationCommentsNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lorem_ipsum"
+                android:textColor="@color/secondary_text"
                 android:lines="1"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin" />
+                android:layout_marginEnd="@dimen/widget_base_margin" />
             <ImageView
                 android:id="@+id/ivLocationRates"
                 android:layout_width="@dimen/widget_icons_size"
                 android:layout_height="@dimen/widget_icons_size"
-                android:layout_marginEnd="@dimen/comment_list_item_padding"
+                android:layout_marginEnd="@dimen/widget_base_margin"
                 android:src="@drawable/ic_rate_orange" />
             <TextView
                 android:id="@+id/tvLocationRates"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lorem_ipsum"
+                android:textColor="@color/secondary_text"
                 android:lines="1"
-                android:layout_marginEnd="@dimen/activity_horizontal_margin" />
+                android:layout_marginEnd="@dimen/widget_base_margin" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

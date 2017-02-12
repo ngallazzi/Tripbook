@@ -56,7 +56,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mContext = this;
         mDatabase = FirebaseHelper.getDatabase();
-        mLocationKey = getIntent().getStringExtra(getString(R.string.location_id));
+        mLocationKey = getIntent().getStringExtra(getString(R.string.location_key_id));
         String locationTitle = getIntent().getStringExtra(getString(R.string.location_name_id));
         setSupportActionBar(tbLocationDetails);;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -140,6 +140,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
+            supportFinishAfterTransition();
             finish();
             return true;
         }

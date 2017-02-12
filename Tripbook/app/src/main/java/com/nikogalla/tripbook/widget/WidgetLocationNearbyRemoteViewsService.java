@@ -131,8 +131,7 @@ public class WidgetLocationNearbyRemoteViewsService extends RemoteViewsService {
                 String locationKey = data.getString(INDEX_KEY);
                 // On list item click
                 final Intent fillInIntent = new Intent();
-                fillInIntent.putExtra(getString(R.string.location_id),locationKey);
-                fillInIntent.putExtra(getString(R.string.location_id),locationKey);
+                fillInIntent.putExtra(getString(R.string.location_key_id),locationKey);
                 fillInIntent.putExtra(getString(R.string.location_name_id),locationName);
                 views.setOnClickFillInIntent(R.id.llItemLocationContainer, fillInIntent);
 

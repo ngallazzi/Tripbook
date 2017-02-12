@@ -1,0 +1,156 @@
+Parallel execution with configuration on demand is an incubating feature.
+:app:preBuild UP-TO-DATE
+:app:preDebugBuild UP-TO-DATE
+:app:checkDebugManifest
+:app:preReleaseBuild UP-TO-DATE
+:app:prepareComAndroidSupportAnimatedVectorDrawable2510Library UP-TO-DATE
+:app:prepareComAndroidSupportAppcompatV72510Library UP-TO-DATE
+:app:prepareComAndroidSupportCardviewV72510Library UP-TO-DATE
+:app:prepareComAndroidSupportCustomtabs2510Library UP-TO-DATE
+:app:prepareComAndroidSupportDesign2510Library UP-TO-DATE
+:app:prepareComAndroidSupportMediarouterV72400Library UP-TO-DATE
+:app:preDebugAndroidTestBuild UP-TO-DATE
+:app:prepareComAndroidSupportMultidex101Library UP-TO-DATE
+:app:prepareComAndroidSupportPaletteV72400Library UP-TO-DATE
+:app:prepareComAndroidSupportRecyclerviewV72510Library UP-TO-DATE
+:app:prepareComAndroidSupportSupportCompat2510Library UP-TO-DATE
+:app:prepareComAndroidSupportSupportCoreUi2510Library UP-TO-DATE
+:app:prepareComAndroidSupportSupportCoreUtils2510Library UP-TO-DATE
+:app:prepareComAndroidSupportSupportFragment2510Library UP-TO-DATE
+:app:prepareComAndroidSupportSupportMediaCompat2510Library UP-TO-DATE
+:app:prepareComAndroidSupportSupportV42510Library UP-TO-DATE
+:app:prepareComAndroidSupportSupportVectorDrawable2510Library UP-TO-DATE
+:app:prepareComAndroidSupportTransition2510Library UP-TO-DATE
+:app:prepareComFacebookAndroidFacebookAndroidSdk4180Library UP-TO-DATE
+:app:prepareComFirebaseuiFirebaseUiAuth111Library UP-TO-DATE
+:app:prepareComGithubOrnolfrRatingView012Library UP-TO-DATE
+:app:prepareComGithubRahatarmanahmedCircularprogressview250Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServices1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesAds1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesAdsLite1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesAnalytics1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesAnalyticsImpl1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesAppinvite1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesAuth1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesAuthBase1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesAwareness1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesBase1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesBasement1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesCast1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesCastFramework1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesClearcut1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesDrive1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesFitness1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesGames1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesGass1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesGcm1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesIdentity1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesIid1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesInstantapps1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesLocation1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesMaps1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesNearby1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesPanorama1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesPlaces1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesPlus1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesSafetynet1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesTagmanager1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesTagmanagerApi1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesTagmanagerV4Impl1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesTasks1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesVision1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesWallet1001Library UP-TO-DATE
+:app:prepareComGoogleAndroidGmsPlayServicesWearable1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseAnalytics1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseAnalyticsImpl1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseAppindexing1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseAuth1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseCommon1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseConfig1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseCore1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseCrash1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseDatabase1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseDatabaseConnection1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseIid1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseMessaging1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseStorage1001Library UP-TO-DATE
+:app:prepareComGoogleFirebaseFirebaseStorageCommon1001Library UP-TO-DATE
+:app:prepareComJakewhartonButterknife851Library UP-TO-DATE
+:app:prepareComTwitterSdkAndroidTweetComposer230Library UP-TO-DATE
+:app:prepareComTwitterSdkAndroidTweetUi230Library UP-TO-DATE
+:app:prepareComTwitterSdkAndroidTwitter230Library UP-TO-DATE
+:app:prepareComTwitterSdkAndroidTwitterCore230Library UP-TO-DATE
+:app:prepareDeHdodenhofCircleimageview130Library UP-TO-DATE
+:app:prepareIoFabricSdkAndroidFabric1314Library UP-TO-DATE
+:app:prepareDebugDependencies
+:app:compileDebugAidl UP-TO-DATE
+:app:compileDebugRenderscript UP-TO-DATE
+:app:generateDebugBuildConfig UP-TO-DATE
+:app:generateDebugResValues UP-TO-DATE
+:app:processDebugGoogleServices
+Parsing json file: C:\Sviluppo\Mobile\AndroidStudio\Nanodegree\Capstone-Project\Tripbook\app\google-services.json
+:app:generateDebugResources
+:app:mergeDebugResources UP-TO-DATE
+:app:processDebugManifest UP-TO-DATE
+:app:processDebugResources UP-TO-DATE
+:app:generateDebugSources UP-TO-DATE
+:app:incrementalDebugJavaCompilationSafeguard UP-TO-DATE
+:app:compileDebugJavaWithJavac UP-TO-DATE
+:app:compileDebugNdk UP-TO-DATE
+:app:compileDebugSources UP-TO-DATE
+:app:mergeDebugShaders UP-TO-DATE
+:app:compileDebugShaders UP-TO-DATE
+:app:generateDebugAssets UP-TO-DATE
+:app:mergeDebugAssets UP-TO-DATE
+:app:transformClassesWithJarMergingForDebug UP-TO-DATE
+:app:transformClassesWithMultidexlistForDebug UP-TO-DATE
+:app:transformClassesWithDexForDebug UP-TO-DATE
+:app:mergeDebugJniLibFolders UP-TO-DATE
+:app:transformNative_libsWithMergeJniLibsForDebug UP-TO-DATE
+:app:processDebugJavaRes UP-TO-DATE
+:app:transformResourcesWithMergeJavaResForDebug UP-TO-DATE
+:app:validateSigningDebug
+:app:packageDebug UP-TO-DATE
+:app:assembleDebug UP-TO-DATE
+:app:checkReleaseManifest
+:app:prepareReleaseDependencies
+:app:compileReleaseAidl UP-TO-DATE
+:app:compileReleaseRenderscript UP-TO-DATE
+:app:generateReleaseBuildConfig UP-TO-DATE
+:app:generateReleaseResValues UP-TO-DATE
+:app:processReleaseGoogleServices
+Parsing json file: C:\Sviluppo\Mobile\AndroidStudio\Nanodegree\Capstone-Project\Tripbook\app\google-services.json
+:app:generateReleaseResources
+:app:mergeReleaseResources UP-TO-DATE
+:app:processReleaseManifest UP-TO-DATE
+:app:processReleaseResources UP-TO-DATE
+:app:generateReleaseSources UP-TO-DATE
+:app:incrementalReleaseJavaCompilationSafeguard UP-TO-DATE
+:app:compileReleaseJavaWithJavac UP-TO-DATE
+:app:compileReleaseNdk UP-TO-DATE
+:app:compileReleaseSources UP-TO-DATE
+:app:mergeReleaseShaders UP-TO-DATE
+:app:compileReleaseShaders UP-TO-DATE
+:app:generateReleaseAssets UP-TO-DATE
+:app:mergeReleaseAssets UP-TO-DATE
+:app:transformClassesWithJarMergingForRelease UP-TO-DATE
+:app:transformClassesWithMultidexlistForRelease UP-TO-DATE
+:app:transformClassesWithDexForRelease UP-TO-DATE
+:app:mergeReleaseJniLibFolders UP-TO-DATE
+:app:transformNative_libsWithMergeJniLibsForRelease UP-TO-DATE
+:app:processReleaseJavaRes UP-TO-DATE
+:app:transformResourcesWithMergeJavaResForRelease UP-TO-DATE
+:app:validateSigningRelease FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:validateSigningRelease'.
+> Keystore file C:\Sviluppo\Mobile\AndroidStudio\Nanodegree\Capstone-Project\Tripbook\app\keystore not found for signing config 'release'.
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+
+BUILD FAILED
+
+Total time: 8.997 secs

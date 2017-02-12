@@ -27,6 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/destination_card_height"
                 android:src="@drawable/camera_placeholder"
+                android:transitionName="@string/shared_element_transition_id"
                 android:scaleType="centerCrop" />
             <android.support.v7.widget.Toolbar
                 android:id="@+id/tbLocationDetails"

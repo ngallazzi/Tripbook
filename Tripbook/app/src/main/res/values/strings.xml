@@ -13,6 +13,7 @@
     <string name="add_image">Add image</string>
     <string name="rate">Rate</string>
     <string name="location_id" translatable="false">location_id</string>
+    <string name="location_key_id" translatable="false">location_key_id</string>
     <string name="location_name_id" translatable="false">location_name_id</string>
     <string name="comments">Comments:</string>
     <string name="add_comment">Add a comment</string>
@@ -45,6 +46,7 @@
     <string name="take_photo">Take photo</string>
     <string name="cancel">Cancel</string>
     <string name="select_from_gallery">Select from gallery</string>
+    <string name="shared_element_transition_id">shared_el_transition_id</string>
     <!-- Account type (for sync-adapter authenticator) -->
     <!-- TripbookSyncAdapter related -->
     <string name="sync_account_type">tripbook.nikogalla.com</string>

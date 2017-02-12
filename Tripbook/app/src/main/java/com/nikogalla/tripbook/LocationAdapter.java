@@ -1,5 +1,6 @@
 package com.nikogalla.tripbook;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +41,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     private final String TAG = LocationAdapter.class.getSimpleName();
     private ArrayList<Location> mLocations;
     private Context mContext;
+    private AroundYouActivity mActivity;
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -62,6 +65,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     public LocationAdapter(ArrayList<Location> myDataset, Context context) {
         mLocations = myDataset;
         mContext = context;
+        mActivity= (AroundYouActivity) context;
     }
 
     // Create new views (invoked by the layout manager)
@@ -90,9 +94,12 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext,LocationDetailsActivity.class);
-                intent.putExtra(mContext.getString(R.string.location_id),location.getKey());
+                intent.putExtra(mContext.getString(R.string.location_key_id),location.getKey());
                 intent.putExtra(mContext.getString(R.string.location_name_id),location.name);
-                mContext.startActivity(intent);
+                intent.putExtra(mContext.getString(R.string.location_id),location);
+                ActivityOptionsCompat options = ActivityOptionsCompat.
+                        makeSceneTransitionAnimation(mActivity,(View)holder.ivLocation, mContext.getString(R.string.shared_element_transition_id));
+                mContext.startActivity(intent, options.toBundle());
             }
         });
         holder.ibLocationShare.setOnClickListener(new View.OnClickListener() {

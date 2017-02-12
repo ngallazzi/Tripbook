@@ -15,6 +15,7 @@
         <ImageView
             android:id="@+id/ivLocation"
             android:contentDescription="@string/image_placeholder"
+            android:transitionName="@string/shared_element_transition_id"
             android:layout_width="match_parent"
             android:layout_height="@dimen/destination_card_image_height"
             android:scaleType="centerCrop"
