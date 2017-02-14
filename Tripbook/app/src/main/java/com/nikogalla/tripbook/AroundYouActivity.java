@@ -5,6 +5,8 @@ import android.accounts.Account;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -35,6 +37,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nikogalla.tripbook.data.FirebaseHelper;
 import com.nikogalla.tripbook.data.LocationContract;
+import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.prefs.PreferencesUtils;
 import com.nikogalla.tripbook.prefs.SettingsActivity;
@@ -67,9 +70,11 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     FirebaseDatabase mDatabase;
     private Context mContext;
     private final int LOCATION_REQUEST_ID = 1;
+    private final String SAVED_RECYCLER_VIEW_STATUS_ID = "rv_status_id";
 
     GoogleApiClient mGoogleApiClient;
-    android.location.Location mGpsLocation;
+    android.location.Location gpsLocation;
+    Parcelable listState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,14 +87,6 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         mDatabase = FirebaseHelper.getDatabase();
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
-        mRvLocations.setHasFixedSize(true);
-        mLocationsArrayList = new ArrayList<>();
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRvLocations.setLayoutManager(mLayoutManager);
-        // specify an adapter (see also next example)
-        mLocationsAdapter = new LocationAdapter(mLocationsArrayList,mContext);
-        mRvLocations.setAdapter(mLocationsAdapter);
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -105,6 +102,21 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                     .addApi(LocationServices.API)
                     .build();
         }
+        initRecyclerView();
+    }
+
+    private void initRecyclerView(){
+        mRvLocations.setHasFixedSize(true);
+        mLocationsArrayList = new ArrayList<>();
+        // use a linear layout manager
+
+        mLayoutManager = new LinearLayoutManager(this);
+        mRvLocations.setLayoutManager(mLayoutManager);
+        // specify an adapter (see also next example)
+
+        mLocationsAdapter = new LocationAdapter(mLocationsArrayList,mContext);
+        mRvLocations.setAdapter(mLocationsAdapter);
+
         mRvLocations.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -150,17 +162,25 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     @Override
     protected void onPause() {
         super.onPause();
+        // save RecyclerView state
+
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // restore RecyclerView state
+    }
 
     public void getLocations(){
+        Log.v(TAG,"getting locations");
         mLocationsArrayList.clear();
         DatabaseReference ref = mDatabase.getReference(Location.LOCATION_TABLE_NAME);
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Location location = dataSnapshot.getValue(Location.class);
-                int distance = LocationUtils.getLocationDistanceFromMyLocation(location,mGpsLocation);
+                int distance = LocationUtils.getLocationDistanceFromMyLocation(location,gpsLocation);
                 location.distance = distance;
                 if (LocationUtils.isLocationDistanceInRange(distance,mContext)){
                     mLocationsArrayList.add(location);
@@ -197,11 +217,15 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                }else{
                    Collections.sort(mLocationsArrayList,new LocationUtils.LocationDistanceComparator());
                    // Saving location locally for widget
-                   LocationContract.LocationEntry.saveLocationsLocally(mLocationsArrayList,mContext);
+                   LocationDbHelper.saveLocationsLocally(mLocationsArrayList,mContext);
                    TripbookSyncAdapter.updateWidgets(mContext);
                    mLocationsAdapter.notifyDataSetChanged();
                    tvNoLocationsFound.setVisibility(View.GONE);
                    mRvLocations.setVisibility(View.VISIBLE);
+                   if (listState!=null){
+                       mRvLocations.getLayoutManager().onRestoreInstanceState(listState);
+                       Log.v(TAG,"Restoring recycler view state");
+                   }
                }
             }
 
@@ -210,13 +234,6 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
 
             }
         });
-    }
-
-
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -268,13 +285,12 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mGpsLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            gpsLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             TripbookSyncAdapter.initializeSyncAdapter(mContext);
             getLocations();
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST_ID);
         }
-        // Test, remove
     }
 
     @Override
@@ -285,11 +301,10 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    mGpsLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                    gpsLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                     getLocations();
                 }else{
                     Toast.makeText(mContext,getString(R.string.alert_localization),Toast.LENGTH_SHORT).show();
-                    getLocations();
                 }
                 return;
             }
@@ -306,5 +321,18 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
 
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Parcelable listState = mRvLocations.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable(SAVED_RECYCLER_VIEW_STATUS_ID, listState);
+    }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            listState = savedInstanceState.getParcelable(SAVED_RECYCLER_VIEW_STATUS_ID);
+        }
+    }
 }

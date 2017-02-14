@@ -1,17 +1,21 @@
 package com.nikogalla.tripbook.data;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.nikogalla.tripbook.data.LocationContract.LocationEntry;
+import com.nikogalla.tripbook.models.Location;
+
+import java.util.ArrayList;
 
 /**
  * Created by Nicola on 2017-02-03.
  */
 
 public class LocationDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 11;
 
     static final String DATABASE_NAME = "location.db";
 
@@ -49,5 +53,50 @@ public class LocationDbHelper extends SQLiteOpenHelper {
         // should be your top priority before modifying this method.
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + LocationEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
+    }
+
+    public static void saveLocationLocally(Location location, Context context){
+        // Table location
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(LocationEntry.COLUMN_KEY, location.getKey());
+        contentValues.put(LocationEntry.COLUMN_ADDRESS, location.address);
+        contentValues.put(LocationEntry.COLUMN_LATITUDE, location.latitude);
+        contentValues.put(LocationEntry.COLUMN_LONGITUDE, location.longitude);
+        contentValues.put(LocationEntry.COLUMN_NAME, location.name);
+        contentValues.put(LocationEntry.COLUMN_PICTURE_URL, location.getMainPhotoUrl());
+        contentValues.put(LocationEntry.COLUMN_DESCRIPTION, location.description);
+        contentValues.put(LocationEntry.COLUMN_DISTANCE, location.distance);
+        contentValues.put(LocationEntry.COLUMN_USER_ID, location.userId);
+        contentValues.put(LocationEntry.COLUMN_COMMENT_COUNT, location.comments.size());
+        contentValues.put(LocationEntry.COLUMN_RATE, location.getRate());
+        contentValues.put(LocationEntry.COLUMN_RATE_COUNT, location.rates.size());
+        context.getContentResolver().insert(LocationContract.LocationEntry.CONTENT_URI, contentValues);
+    }
+
+
+    public static int saveLocationsLocally(ArrayList<Location> locations, Context context){
+        ArrayList<ContentValues> locationsToInsert = new ArrayList<>();
+        int insertedRowsCount = -1;
+        for (Location location : locations){
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(LocationEntry.COLUMN_KEY, location.getKey());
+            contentValues.put(LocationEntry.COLUMN_ADDRESS, location.address);
+            contentValues.put(LocationEntry.COLUMN_LATITUDE, location.latitude);
+            contentValues.put(LocationEntry.COLUMN_LONGITUDE, location.longitude);
+            contentValues.put(LocationEntry.COLUMN_NAME, location.name);
+            contentValues.put(LocationEntry.COLUMN_PICTURE_URL, location.getMainPhotoUrl());
+            contentValues.put(LocationEntry.COLUMN_DESCRIPTION, location.description);
+            contentValues.put(LocationEntry.COLUMN_DISTANCE, location.distance);
+            contentValues.put(LocationEntry.COLUMN_USER_ID, location.userId);
+            contentValues.put(LocationEntry.COLUMN_COMMENT_COUNT, location.comments.size());
+            contentValues.put(LocationEntry.COLUMN_RATE, location.getRate());
+            contentValues.put(LocationEntry.COLUMN_RATE_COUNT, location.rates.size());
+            locationsToInsert.add(contentValues);
+        }
+        // Add products to the database
+        ContentValues[] cvArray = new ContentValues[locationsToInsert.size()];
+        locationsToInsert.toArray(cvArray);
+        insertedRowsCount = context.getContentResolver().bulkInsert(LocationContract.LocationEntry.CONTENT_URI, cvArray);
+        return insertedRowsCount;
     }
 }

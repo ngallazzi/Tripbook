@@ -15,6 +15,7 @@
     app:theme="@style/Splash">
     <ImageView
         android:src="@drawable/tripbook_logo_splash"
+        android:contentDescription="@string/app_logo_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </RelativeLayout>

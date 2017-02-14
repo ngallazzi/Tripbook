@@ -51,7 +51,7 @@
             android:parentActivityName=".AroundYouActivity" />
         <activity android:name=".RateActivity"
             android:parentActivityName=".LocationDetailsActivity" />
-        <activity android:name=".prefs.SettingsActivity" />
+        <activity android:name=".prefs.SettingsActivity" android:parentActivityName=".AroundYouActivity" />
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.nikogalla.tripbook.fileprovider"

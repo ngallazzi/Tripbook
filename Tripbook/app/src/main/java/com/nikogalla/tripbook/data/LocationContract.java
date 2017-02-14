@@ -53,55 +53,22 @@ public class LocationContract {
         public static final String COLUMN_RATE = "rate";
         public static final String COLUMN_RATE_COUNT = "rate_count";
         public static final String COLUMN_USER_ID = "user_id";
+        public static final String COLUMN_IS_FAVORITE = "is_favorite";
 
         public static Uri buildLocationUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static void saveLocationLocally(Location location, Context context){
-            // Table location
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(COLUMN_KEY, location.getKey());
-            contentValues.put(COLUMN_ADDRESS, location.address);
-            contentValues.put(COLUMN_LATITUDE, location.latitude);
-            contentValues.put(COLUMN_LONGITUDE, location.longitude);
-            contentValues.put(COLUMN_NAME, location.name);
-            contentValues.put(COLUMN_PICTURE_URL, location.getMainPhotoUrl());
-            contentValues.put(COLUMN_DESCRIPTION, location.description);
-            contentValues.put(COLUMN_DISTANCE, location.distance);
-            contentValues.put(COLUMN_USER_ID, location.userId);
-            contentValues.put(COLUMN_COMMENT_COUNT, location.comments.size());
-            contentValues.put(COLUMN_RATE, location.getRate());
-            contentValues.put(COLUMN_RATE_COUNT, location.rates.size());
-            context.getContentResolver().insert(LocationContract.LocationEntry.CONTENT_URI, contentValues);
+        // Useful to fetch a specific row inside the table
+        public static Uri buildLocationUriWithLocationKey(String key) {
+            Uri uri = CONTENT_URI.buildUpon()
+                    .appendPath(key)
+                    .build();
+            return uri;
         }
-        public static int saveLocationsLocally(ArrayList<Location> locations, Context context){
-            // Delete existing locations
-            context.getContentResolver().delete(LocationContract.LocationEntry.CONTENT_URI,null,null);
 
-            ArrayList<ContentValues> locationsToInsert = new ArrayList<>();
-            int insertedRowsCount = -1;
-            for (Location location : locations){
-                ContentValues contentValues = new ContentValues();
-                contentValues.put(COLUMN_KEY, location.getKey());
-                contentValues.put(COLUMN_ADDRESS, location.address);
-                contentValues.put(COLUMN_LATITUDE, location.latitude);
-                contentValues.put(COLUMN_LONGITUDE, location.longitude);
-                contentValues.put(COLUMN_NAME, location.name);
-                contentValues.put(COLUMN_PICTURE_URL, location.getMainPhotoUrl());
-                contentValues.put(COLUMN_DESCRIPTION, location.description);
-                contentValues.put(COLUMN_DISTANCE, location.distance);
-                contentValues.put(COLUMN_USER_ID, location.userId);
-                contentValues.put(COLUMN_COMMENT_COUNT, location.comments.size());
-                contentValues.put(COLUMN_RATE, location.getRate());
-                contentValues.put(COLUMN_RATE_COUNT, location.rates.size());
-                locationsToInsert.add(contentValues);
-            }
-            // Add products to the database
-            ContentValues[] cvArray = new ContentValues[locationsToInsert.size()];
-            locationsToInsert.toArray(cvArray);
-            insertedRowsCount = context.getContentResolver().bulkInsert(LocationContract.LocationEntry.CONTENT_URI, cvArray);
-            return insertedRowsCount;
+        public static String getLocationKeyFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
         }
     }
 }

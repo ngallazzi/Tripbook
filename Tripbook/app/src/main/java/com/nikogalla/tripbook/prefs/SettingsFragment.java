@@ -3,6 +3,8 @@ package com.nikogalla.tripbook.prefs;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -26,6 +28,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         mContext = this.getActivity();
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
+        initSummaries();
+    }
+
+    public void initSummaries(){
+
+        Preference distanceUnitPref = findPreference(getString(R.string.preference_distance_unit_key));
+        ListPreference etp = (ListPreference) distanceUnitPref;
+        etp.setSummary(etp.getEntry());
+
+        Preference distanceRangePref = findPreference(getString(R.string.preference_distance_range_key));
+        EditTextPreference listPref = (EditTextPreference) distanceRangePref;
+        distanceRangePref.setSummary(listPref.getText());
     }
 
     @Override
@@ -48,10 +62,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
 
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.matches(getString(R.string.preference_distance_range_key))){
-            getActivity().finish();
+        Preference pref = findPreference(key);
+        if (pref instanceof EditTextPreference) {
+            EditTextPreference etp = (EditTextPreference) pref;
+            pref.setSummary(etp.getText());
+        }
+        if (pref instanceof ListPreference) {
+            ListPreference listPref = (ListPreference) pref;
+            pref.setSummary(listPref.getEntry());
         }
     }
 }

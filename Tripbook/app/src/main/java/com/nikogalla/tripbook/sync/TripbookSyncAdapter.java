@@ -32,6 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.nikogalla.tripbook.R;
 import com.nikogalla.tripbook.data.FirebaseHelper;
 import com.nikogalla.tripbook.data.LocationContract;
+import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.utils.LocationUtils;
 import com.nikogalla.tripbook.utils.StatusSnackBars;
@@ -182,7 +183,7 @@ public class TripbookSyncAdapter extends AbstractThreadedSyncAdapter {
                 if (mLocationArrayList.size() > 0){
                     Collections.sort(mLocationArrayList,new LocationUtils.LocationDistanceComparator());
                     // Saving location locally for widget
-                    LocationContract.LocationEntry.saveLocationsLocally(mLocationArrayList,mContext);
+                    LocationDbHelper.saveLocationsLocally(mLocationArrayList,mContext);
                     Log.v(TAG,"Location saved by sync adapter");
                     updateWidgets(mContext);
                 }

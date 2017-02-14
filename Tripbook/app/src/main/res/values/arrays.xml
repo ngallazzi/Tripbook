@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="distance_units">
-        <item>Kilometers</item>
-        <item>Miles</item>
+        <item>@string/kilometers_ext</item>
+        <item>@string/miles_ext</item>
     </string-array>
     <string-array name="distance_units_values">
-        <item>km</item>
-        <item>mile</item>
+        <item>@string/kilometers</item>
+        <item>@string/miles</item>
     </string-array>
 </resources>

@@ -42,7 +42,11 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -84,6 +88,8 @@ public class AddLocationActivity extends AppCompatActivity implements OnConnecti
     CoordinatorLayout clAddLocationActivityContainer;
     @BindView(R.id.ivAddPicture)
     ImageView ivAddPicture;
+    @BindView(R.id.ivLocationName)
+    ImageView ivLocationName;
 
     @NotEmpty
     @BindView(R.id.etLocationName)
@@ -134,21 +140,13 @@ public class AddLocationActivity extends AppCompatActivity implements OnConnecti
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         etLocationName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus){
-                    try {
-                        Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
-                                        .build(AddLocationActivity.this);
-                        startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                    } catch (GooglePlayServicesRepairableException e) {
-                        StatusSnackBars.getErrorSnackBar(getString(R.string.unable_to_find_places),clAddLocationActivityContainer).show();
-                    } catch (GooglePlayServicesNotAvailableException e) {
-                        StatusSnackBars.getErrorSnackBar(getString(R.string.google_play_services_unavailable),clAddLocationActivityContainer).show();
-                    }
+                    startSearchWithGoogleIntent();
                 }
             }
         });
@@ -174,6 +172,25 @@ public class AddLocationActivity extends AppCompatActivity implements OnConnecti
                 builder.show();
             }
         });
+        etLocationName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startSearchWithGoogleIntent();
+            }
+        });
+    }
+
+    public void startSearchWithGoogleIntent(){
+        try {
+            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                    .build(AddLocationActivity.this).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra(getString(R.string.location_id),etLocationName.getText().toString());
+            startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+        } catch (GooglePlayServicesRepairableException e) {
+            StatusSnackBars.getErrorSnackBar(getString(R.string.unable_to_find_places),clAddLocationActivityContainer).show();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            StatusSnackBars.getErrorSnackBar(getString(R.string.google_play_services_unavailable),clAddLocationActivityContainer).show();
+        }
     }
 
     @Override
@@ -258,10 +275,34 @@ public class AddLocationActivity extends AppCompatActivity implements OnConnecti
 
     @Override
     public void onValidationSucceeded() {
-
+        Log.v(TAG,"Validation succeded");
         hideKeyboard();
-        uploadImageAndWriteLocation(mPlace.getAddress().toString(),String.valueOf(etLocationDescription.getText()),
-                mPlace.getLatLng().latitude,mPlace.getLatLng().longitude,mPlace.getName().toString());
+        checkIflocationWithSameNameExists();
+    }
+
+    public void checkIflocationWithSameNameExists(){
+        Query query = mDatabase.child(Location.LOCATION_TABLE_NAME).orderByChild("name").equalTo(etLocationName.getText().toString());
+        ValueEventListener valueEventListener = new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                if (dataSnapshot.getChildren().iterator().hasNext()){
+                    Toast.makeText(mContext,getString(R.string.duplicate_location_name),Toast.LENGTH_SHORT).show();
+                    Log.d(TAG,"Already exists");
+                }else{
+                    Log.d(TAG,"New location!");
+                    uploadImageAndWriteLocation(mPlace.getAddress().toString(),String.valueOf(etLocationDescription.getText()),
+                            mPlace.getLatLng().latitude,mPlace.getLatLng().longitude,mPlace.getName().toString());
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+                Toast.makeText(mContext,getString(R.string.database_error),Toast.LENGTH_SHORT).show();
+            }
+        };
+        query.addListenerForSingleValueEvent(valueEventListener);
     }
 
     public void hideKeyboard(){

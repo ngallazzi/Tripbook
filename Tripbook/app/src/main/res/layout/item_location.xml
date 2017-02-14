@@ -58,6 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/ic_comments_light"
+                        android:contentDescription="@string/comment_image_hint"
                         android:cropToPadding="false" />
                     <TextView
                         android:id="@+id/tvLocationComments"
@@ -73,6 +74,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="@string/rate_image_hint"
                         android:src="@drawable/ic_rate_orange" />
                     <TextView
                         android:id="@+id/tvLocationRates"

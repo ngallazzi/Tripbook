@@ -2,6 +2,7 @@ package com.nikogalla.tripbook.utils;
 
 import android.content.Context;
 
+import com.nikogalla.tripbook.R;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.prefs.PreferencesUtils;
 
@@ -12,9 +13,18 @@ import java.util.Comparator;
  */
 
 public class LocationUtils {
-    public static boolean isLocationDistanceInRange(double distance, Context context){
-        int preferredDistance = new PreferencesUtils(context).getPreferredUserRange()*1000;
-        if (distance<= preferredDistance){
+    public static boolean isLocationDistanceInRange(double distanceInMeters, Context context){
+        final float KM_TO_METER_MULTIPLIER = 1000.0f;
+        final float MI_TO_METER_MULTIPLIER = 1609.34f;
+        PreferencesUtils prefs = new PreferencesUtils(context);
+        String unit = prefs.getPreferredDistanceUnit();
+        float preferredDistance;
+        if (unit.matches(context.getString(R.string.kilometers))){
+            preferredDistance = new PreferencesUtils(context).getPreferredUserRange()*KM_TO_METER_MULTIPLIER;
+        }else{
+            preferredDistance = new PreferencesUtils(context).getPreferredUserRange()*MI_TO_METER_MULTIPLIER;
+        }
+        if (distanceInMeters<= preferredDistance){
             return true;
         }
         return false;

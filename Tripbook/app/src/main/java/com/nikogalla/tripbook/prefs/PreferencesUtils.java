@@ -31,7 +31,7 @@ public class PreferencesUtils {
             int intValueDistance = Integer.valueOf(prefDistance);
             return intValueDistance;
         }catch (Exception e ){
-            Log.e(TAG,e.getMessage());
+
         }
         return defDistanceInt;
     }

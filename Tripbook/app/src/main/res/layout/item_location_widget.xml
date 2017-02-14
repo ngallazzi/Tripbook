@@ -11,6 +11,7 @@
         android:id="@+id/ivLocationImage"
         android:layout_width="@dimen/widget_image_size"
         android:layout_height="@dimen/widget_image_size"
+        android:contentDescription="@string/location_image_hint"
         android:src="@drawable/camera_placeholder"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:scaleType="centerCrop"
@@ -37,6 +38,7 @@
                 android:layout_width="@dimen/widget_icons_size"
                 android:layout_height="@dimen/widget_icons_size"
                 android:layout_marginEnd="@dimen/widget_base_margin"
+                android:contentDescription="@string/location_distance_hint"
                 android:src="@drawable/ic_address" />
             <TextView
                 android:id="@+id/tvLocationDistance"
@@ -50,6 +52,7 @@
                 android:layout_width="@dimen/widget_icons_size"
                 android:layout_height="@dimen/widget_icons_size"
                 android:layout_marginEnd="@dimen/widget_base_margin"
+                android:contentDescription="@string/comment_image_hint"
                 android:src="@drawable/ic_comments_green" />
             <TextView
                 android:id="@+id/tvLocationCommentsNumber"
@@ -63,6 +66,7 @@
                 android:layout_width="@dimen/widget_icons_size"
                 android:layout_height="@dimen/widget_icons_size"
                 android:layout_marginEnd="@dimen/widget_base_margin"
+                android:contentDescription="@string/rate_image_hint"
                 android:src="@drawable/ic_rate_orange" />
             <TextView
                 android:id="@+id/tvLocationRates"

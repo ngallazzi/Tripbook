@@ -46,6 +46,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nikogalla.tripbook.data.FirebaseHelper;
 import com.nikogalla.tripbook.data.LocationContract;
+import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
 import com.nikogalla.tripbook.utils.LocationUtils;
 import com.nikogalla.tripbook.utils.NetworkUtils;
@@ -83,6 +84,7 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
     ArrayList<com.nikogalla.tripbook.models.Location> mLocationsArrayList;
     FirebaseDatabase mDatabase;
     GoogleApiClient mGoogleApiClient;
+    Location currentLocation;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -129,7 +131,7 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
         mMap.setInfoWindowAdapter(new TripBookInfoWindow());
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -186,14 +188,10 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
                 }else{
                     Collections.sort(mLocationsArrayList,new LocationUtils.LocationDistanceComparator());
                     // Saving location locally for widget
-                    LocationContract.LocationEntry.saveLocationsLocally(mLocationsArrayList,mContext);
+                    LocationDbHelper.saveLocationsLocally(mLocationsArrayList,mContext);
                     TripbookSyncAdapter.updateWidgets(mContext);
                     int locIndex = 0;
                     for (com.nikogalla.tripbook.models.Location l: mLocationsArrayList){
-                        if (locIndex == 0){
-                            LatLng coordinates = new LatLng(l.latitude,l.longitude);
-                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, MAP_ZOOM));
-                        }
                         marker = new LatLng(l.latitude, l.longitude);
                         Marker m = mMap.addMarker(new MarkerOptions()
                                 .title(l.name)
@@ -215,15 +213,18 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
     @Override
     public void onInfoWindowClick(Marker marker) {
         String locationId = marker.getSnippet();
+        String locationName = marker.getTitle();
         Intent intent = new Intent(mContext,LocationDetailsActivity.class);
-        intent.putExtra(getString(R.string.location_id),locationId);
+        intent.putExtra(getString(R.string.location_key_id),locationId);
+        intent.putExtra(getString(R.string.location_name_id),locationName);
         startActivity(intent);
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         try{
-            Location currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), MAP_ZOOM));
             getLocations(currentLocation);
         }catch (Exception e){
             Log.d(TAG,e.getMessage());

@@ -8,6 +8,7 @@
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/civCommentAuthor"
         android:layout_width="@dimen/user_image_radius"
+        android:contentDescription="@string/author_image_hint"
         android:layout_height="@dimen/user_image_radius"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:src="@drawable/ic_user" />

@@ -32,10 +32,7 @@
                 android:layout_height="@dimen/destination_card_height"
                 android:src="@drawable/camera_placeholder"
                 android:scaleType="center" />
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/divider" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -44,60 +41,72 @@
                 android:paddingStart="@dimen/activity_horizontal_margin"
                 android:paddingEnd="@dimen/activity_horizontal_margin"
                 android:focusable="true" android:focusableInTouchMode="true">
-                <LinearLayout
+
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:layout_marginBottom="@dimen/activity_vertical_margin">
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:focusable="true">
                     <ImageView
+                        android:id="@+id/ivLocationName"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:contentDescription="@string/address_icon"
-                        android:src="@drawable/ic_edit" />
+                        android:src="@drawable/ic_edit"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentStart="true" />
                     <EditText
                         android:id="@+id/etLocationName"
                         android:inputType="text"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_toEndOf="@id/ivLocationName"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/activity_horizontal_margin"
                         android:hint="@string/add_location_name_hint" />
-                </LinearLayout>
-                <LinearLayout
+                </RelativeLayout>
+
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/activity_vertical_margin">
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:focusable="true">
                     <ImageView
+                        android:id="@+id/ivLocationPosition"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:contentDescription="@string/address_icon"
+                        android:layout_centerVertical="true"
                         android:src="@drawable/ic_address" />
                     <EditText
                         android:id="@+id/etLocationAddress"
                         android:inputType="text"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/ivLocationPosition"
                         android:layout_marginStart="@dimen/activity_horizontal_margin"
                         android:hint="@string/add_address_hint" />
-                </LinearLayout>
-                <LinearLayout
+                </RelativeLayout>
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:focusable="true">
                     <ImageView
+                        android:id="@+id/ivLocationDescription"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/address_icon"
+                        android:layout_centerVertical="true"
                         android:src="@drawable/ic_about" />
                     <EditText
                         android:id="@+id/etLocationDescription"
                         android:inputType="text"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/ivLocationDescription"
                         android:layout_marginStart="@dimen/activity_horizontal_margin"
                         android:hint="@string/add_description_hint" />
-                </LinearLayout>
+                </RelativeLayout>
                 <com.github.rahatarmanahmed.cpv.CircularProgressView
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/cpvUpload"

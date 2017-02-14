@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_address_hint">Address</string>
+    <string name="add_comment">Add a comment</string>
+    <string name="add_comment_button_hint">Submit comment</string>
+    <string name="add_description_hint">Add a description here</string>
+    <string name="add_image">Add image</string>
+    <string name="add_location_name_hint">Name</string>
+    <string name="add_rate">Add a rate</string>
+    <string name="address_icon">Edit address icon</string>
+    <string name="app_logo_hint">Tripbook logo</string>
+    <string name="author_image_hint">Author image</string>
+    <string name="choose_location_photo">Choose a source for the location picture</string>
+    <string name="comment_image_hint">Comment image</string>
+    <string name="rate_image_hint">Rate image</string>
+    <string name="location_image_hint">Location image</string>
+    <string name="location_distance_hint">Location distance</string>
+    <string name="description_icon">Edit description icon</string>
+    <string name="add_location">Add a location</string>
+    <string name="widget_logo">Widget logo</string>
+</resources>

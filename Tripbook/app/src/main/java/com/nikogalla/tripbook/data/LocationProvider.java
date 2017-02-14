@@ -22,14 +22,6 @@ public class LocationProvider extends ContentProvider {
     private LocationDbHelper mOpenHelper;
 
     static final int LOCATION = 100;
-    static final int LOCATION_WITH_LOCATION_KEY = 101;
-    static final int LOCATION_WITH_COORDINATES = 102;
-    static final int COMMENT = 104;
-    static final int COMMENT_WITH_LOCATION_KEY = 105;
-    static final int PHOTO = 106;
-    static final int PHOTO_WITH_LOCATION_KEY = 107;
-    static final int RATE = 108;
-    static final int RATE_WITH_LOCATION_KEY = 109;
 
     @Override
     public boolean onCreate() {
@@ -49,6 +41,7 @@ public class LocationProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, LocationContract.PATH_LOCATION, LOCATION);
+
         return matcher;
     }
 
@@ -67,6 +60,7 @@ public class LocationProvider extends ContentProvider {
         retCursor.setNotificationUri(getContext().getContentResolver(),uri);
         return retCursor;
     }
+
 
     @Nullable
     @Override

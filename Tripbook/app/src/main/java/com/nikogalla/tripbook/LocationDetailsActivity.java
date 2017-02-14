@@ -1,11 +1,17 @@
 package com.nikogalla.tripbook;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -19,8 +25,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.nikogalla.tripbook.data.FirebaseHelper;
+import com.nikogalla.tripbook.data.LocationContract;
+import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.models.Comment;
 import com.nikogalla.tripbook.models.Location;
+import com.nikogalla.tripbook.prefs.SettingsActivity;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;

@@ -34,6 +34,7 @@
             android:id="@+id/rtvAddRate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/add_rate"
             app:rating="0"
             />
     </LinearLayout>

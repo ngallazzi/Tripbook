@@ -40,7 +40,7 @@
         <ImageButton
             android:background="@color/tw__transparent"
             android:src="@drawable/ic_comments_green"
-            android:contentDescription="@string/add_comment"
+            android:contentDescription="@string/comment_image_hint"
             android:layout_width="@dimen/comment_bar_height"
             android:layout_height="@dimen/comment_bar_height" />
         <EditText
@@ -54,6 +54,7 @@
             android:id="@+id/ibAddComment"
             android:background="@color/primary"
             android:src="@drawable/ic_confirm_comment"
+            android:contentDescription="@string/add_comment_button_hint"
             android:paddingStart="@dimen/activity_horizontal_margin"
             android:paddingEnd="@dimen/activity_horizontal_margin"
             android:layout_width="@dimen/comment_bar_height"

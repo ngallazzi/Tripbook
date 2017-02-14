@@ -4,4 +4,5 @@
     <string name="unable_to_find_places">Unable to find places</string>
     <string name="google_play_services_unavailable">Google play services not available</string>
     <string name="add_location_error">Unable to add location, check your internet connection</string>
+    <string name="duplicate_location_name">This location already exists!</string>
 </resources>
