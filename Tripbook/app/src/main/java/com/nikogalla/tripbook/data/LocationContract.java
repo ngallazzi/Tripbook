@@ -27,6 +27,7 @@ public class LocationContract {
     public static final String CONTENT_AUTHORITY = "com.nikogalla.tripbook";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_LOCATION = "location";
+    public static final String PATH_USER = "user";
 
     public static final class LocationEntry implements BaseColumns {
 
@@ -68,6 +69,42 @@ public class LocationContract {
         }
 
         public static String getLocationKeyFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+    }
+    public static final class UserEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_USER).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_USER;
+
+        // Table name
+        public static final String TABLE_NAME = "user";
+
+        public static final String COLUMN_UID = "uid";
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_EMAIL = "email";
+        public static final String COLUMN_PROVIDER = "provider";
+        public static final String COLUMN_PICTURE_URL = "picture_url";
+
+        public static Uri buildUserUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        // Useful to fetch a specific row inside the table
+        public static Uri buildUserUriWithUID(String uid) {
+            Uri uri = CONTENT_URI.buildUpon()
+                    .appendPath(uid)
+                    .build();
+            return uri;
+        }
+
+        public static String getUserUidFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
     }

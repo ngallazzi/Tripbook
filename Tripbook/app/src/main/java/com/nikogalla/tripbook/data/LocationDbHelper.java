@@ -6,7 +6,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.nikogalla.tripbook.data.LocationContract.LocationEntry;
+import com.nikogalla.tripbook.data.LocationContract.UserEntry;
 import com.nikogalla.tripbook.models.Location;
+import com.nikogalla.tripbook.models.User;
 
 import java.util.ArrayList;
 
@@ -15,7 +17,7 @@ import java.util.ArrayList;
  */
 
 public class LocationDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 11;
+    private static final int DATABASE_VERSION = 12;
 
     static final String DATABASE_NAME = "location.db";
 
@@ -41,6 +43,16 @@ public class LocationDbHelper extends SQLiteOpenHelper {
                 LocationEntry.COLUMN_USER_ID + " TEXT NOT NULL " +
                 " );";
         sqLiteDatabase.execSQL(SQL_CREATE_LOCATION_TABLE);
+
+        final String SQL_CREATE_USER_TABLE = "CREATE TABLE " + UserEntry.TABLE_NAME + " (" +
+                UserEntry._ID + " INTEGER PRIMARY KEY, " +
+                UserEntry.COLUMN_UID + " TEXT UNIQUE ON CONFLICT REPLACE, " +
+                UserEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                UserEntry.COLUMN_EMAIL + " TEXT NOT NULL, " +
+                UserEntry.COLUMN_PROVIDER + " REAL NOT NULL, " +
+                UserEntry.COLUMN_PICTURE_URL + " TEXT " +
+                " );";
+        sqLiteDatabase.execSQL(SQL_CREATE_USER_TABLE);
     }
 
     @Override
@@ -52,7 +64,20 @@ public class LocationDbHelper extends SQLiteOpenHelper {
         // If you want to update the schema without wiping data, commenting out the next 2 lines
         // should be your top priority before modifying this method.
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + LocationEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + UserEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
+    }
+
+    public static void saveUserLocally(User user, Context context){
+        // Table location
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(UserEntry.COLUMN_UID, user.UID);
+        contentValues.put(UserEntry.COLUMN_NAME, user.name);
+        contentValues.put(UserEntry.COLUMN_EMAIL, user.email);
+        contentValues.put(UserEntry.COLUMN_PROVIDER, user.provider);
+        contentValues.put(UserEntry.COLUMN_PICTURE_URL, user.pictureUrl);
+
+        context.getContentResolver().insert(LocationContract.UserEntry.CONTENT_URI, contentValues);
     }
 
     public static void saveLocationLocally(Location location, Context context){

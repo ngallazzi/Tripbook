@@ -115,6 +115,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnConnecti
     private GoogleApiClient mGoogleApiClient;
     Place mPlace;
     Validator mValidator;
+    Uri downloadUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -244,6 +245,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnConnecti
         }
         else if ((requestCode == REQUEST_SELECT_PHOTO && resultCode == RESULT_OK)){
             Uri selectedImage = data.getData();
+            mCurrentPhotoPath = selectedImage.getPath();
             try{
                 Picasso.with(mContext).load(selectedImage).into(ivAddPicture);
                 ivAddPicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -434,7 +436,7 @@ public class AddLocationActivity extends AppCompatActivity implements OnConnecti
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                downloadUrl = taskSnapshot.getDownloadUrl();
                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 String locationKey = mDatabase.child("locations").push().getKey();
                 Location location = new Location(locationKey,address, latitude, longitude, name, description,userId);
@@ -471,5 +473,27 @@ public class AddLocationActivity extends AppCompatActivity implements OnConnecti
         Log.d(TAG,"Unable to initialize location api");
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        ivAddPicture.setDrawingCacheEnabled(true);
+        ivAddPicture.buildDrawingCache();
+        Bitmap bitmap = ivAddPicture.getDrawingCache();
+        if (bitmap!=null){
+            byte[] imageByteArray = getCompressedBitmapByteArray(bitmap);
+            outState.putByteArray(getString(R.string.location_image_byte_array_id),imageByteArray);
+        }
+        super.onSaveInstanceState(outState);
+    }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState!=null){
+            byte[] imageByteArray  = savedInstanceState.getByteArray(getString(R.string.location_image_byte_array_id));
+            if (imageByteArray!=null){
+                Bitmap bitmap = BitmapFactory.decodeByteArray(imageByteArray, 0, imageByteArray.length);
+                ivAddPicture.setImageBitmap(bitmap);
+            }
+        }
+    }
 }

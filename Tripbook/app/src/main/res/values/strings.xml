@@ -15,6 +15,7 @@
     <string name="rate">Rate</string>
     <string name="location_id" translatable="false">location_id</string>
     <string name="location_key_id" translatable="false">location_key_id</string>
+    <string name="location_image_byte_array_id" translatable="false">location_image_path_id</string>
     <string name="location_name_id" translatable="false">location_name_id</string>
     <string name="comments">Comments:</string>
 
@@ -34,6 +35,7 @@
     <string name="kilometers">km</string>
     <string name="miles">mi</string>
 
+    <string name="account_infos">Account infos</string>
     <string name="mark_as_favorite">Mark as favorite</string>
     <string name="map_layout">Map layout</string>
     <string name="preferences">Preferences</string>

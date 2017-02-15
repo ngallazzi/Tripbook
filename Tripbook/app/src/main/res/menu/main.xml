@@ -13,10 +13,15 @@
         android:title="@string/action_logout"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_user_account"
+        android:orderInCategory="102"
+        android:title="@string/account_infos"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_map_layout"
         android:orderInCategory="103"
         android:title="@string/map_layout"
         android:icon="@drawable/ic_map"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
+
 </menu>

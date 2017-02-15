@@ -106,7 +106,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
             @Override
             public void onClick(View v) {
                 // Get access to the URI for the bitmap
-                Uri bmpUri = getLocalBitmapUri(holder.ivLocation);
+                Uri bmpUri = getLocalBitmapUri(holder.ivLocation, location.name);
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.putExtra(Intent.EXTRA_TEXT, mContext.getString(R.string.share_text,location.name));
                 intent.putExtra(Intent.EXTRA_STREAM, bmpUri);
@@ -161,7 +161,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     }
 
     // Returns the URI path to the Bitmap displayed in specified ImageView
-    public Uri getLocalBitmapUri(ImageView imageView) {
+    public Uri getLocalBitmapUri(ImageView imageView, String locationName) {
         // Extract Bitmap from ImageView drawable
         Drawable drawable = imageView.getDrawable();
         Bitmap bmp = null;
@@ -173,14 +173,10 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         // Store image to default external storage directory
         Uri bmpUri = null;
         try {
-            // Use methods on Context to access package-specific directories on external storage.
-            // This way, you don't need to request external read/write permission.
-            // See https://youtu.be/5xVh-7ywKpE?t=25m25s
-            File file =  new File(mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "share_image_" + System.currentTimeMillis() + ".png");
+            File file =  new File(mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES), locationName + "_" + System.currentTimeMillis() + ".jpg");
             FileOutputStream out = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.PNG, 75, out);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 75, out);
             out.close();
-            // **Warning:** This will fail for API >= 24, use a FileProvider as shown below instead.
             bmpUri = Uri.fromFile(file);
         } catch (IOException e) {
             e.printStackTrace();

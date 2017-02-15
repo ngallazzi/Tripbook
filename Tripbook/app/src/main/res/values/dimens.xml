@@ -14,7 +14,9 @@
     <dimen name="user_image_stroke">2dp</dimen>
     <dimen name="user_layout_width">96dp</dimen>
     <dimen name="user_image_radius">48dp</dimen>
+    <dimen name="user_info_image_icon_size">48dp</dimen>
     <dimen name="sharing_button_margin_top">-192dp</dimen>
+    <dimen name="big_user_picture_size">160dp</dimen>
 
     <dimen name="widget_default_width">240dp</dimen>
     <dimen name="widget_default_height">180dp</dimen>

@@ -11,13 +11,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.ResultCodes;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.nikogalla.tripbook.data.LocationDbHelper;
+import com.nikogalla.tripbook.models.User;
 import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
+import com.nikogalla.tripbook.utils.StatusSnackBars;
 
 import java.util.Arrays;
 
@@ -37,6 +42,7 @@ public class SignUpActivity extends FragmentActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         mContext = this;
         if (auth.getCurrentUser() != null) {
+            updateUserInfo(auth.getCurrentUser());
             // Turn on periodic sync
             // Get the content resolver for your app
             mResolver = getContentResolver();
@@ -70,33 +76,45 @@ public class SignUpActivity extends FragmentActivity {
             // Successfully signed in
             if (resultCode == ResultCodes.OK) {
                 //startActivity(SignedInActivity.createIntent(this, response));
+                updateUserInfo(FirebaseAuth.getInstance().getCurrentUser());
                 Intent intent = new Intent(mContext,AroundYouActivity.class);
                 startActivity(intent);
                 finish();
-                return;
             } else {
                 // Sign in failed
                 if (response == null) {
                     // User pressed back button
-                    Log.v(TAG,"Sign in canceled");
-                    //showSnackbar(R.string.sign_in_cancelled);
+                    Toast.makeText(mContext,getString(R.string.sign_in_canceled),Toast.LENGTH_SHORT).show();
                     return;
                 }
 
                 if (response.getErrorCode() == ErrorCodes.NO_NETWORK) {
-                    //showSnackbar(R.string.no_internet_connection);
-                    Log.v(TAG,"No internet connection");
+                    Toast.makeText(mContext,getString(R.string.no_network),Toast.LENGTH_SHORT).show();;
                     return;
                 }
 
                 if (response.getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                    //showSnackbar(R.string.unknown_error);
-                    Log.v(TAG,"Unknown error");
+                    Toast.makeText(mContext,getString(R.string.unknown_error),Toast.LENGTH_SHORT).show();;
                     return;
                 }
             }
 
             //showSnackbar(R.string.unknown_sign_in_response);
         }
+    }
+
+    public void updateUserInfo(FirebaseUser user){
+        String uid = user.getUid();
+        String name = user.getDisplayName();
+        String email = user.getEmail();
+        String provider = user.getProviderId();
+        String pictureUrl;
+        if (user.getPhotoUrl()!=null){
+            pictureUrl = user.getPhotoUrl().toString();
+        }else{
+            pictureUrl = null;
+        }
+        User tripbookUser = new User(email,name,pictureUrl,provider,uid);
+        LocationDbHelper.saveUserLocally(tripbookUser,mContext);
     }
 }

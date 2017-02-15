@@ -2,13 +2,16 @@ package com.nikogalla.tripbook;
 
 import android.*;
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -19,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -48,11 +53,14 @@ import com.nikogalla.tripbook.data.FirebaseHelper;
 import com.nikogalla.tripbook.data.LocationContract;
 import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
+import com.nikogalla.tripbook.utils.ImageUtils;
 import com.nikogalla.tripbook.utils.LocationUtils;
 import com.nikogalla.tripbook.utils.NetworkUtils;
 import com.nikogalla.tripbook.utils.StatusSnackBars;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,7 +78,7 @@ import butterknife.ButterKnife;
  * Created by Nicola on 2017-02-10.
  */
 
-public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback,  GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     final String TAG = AroundYouMapActivity.class.getSimpleName();
     final int MAP_ZOOM = 10;
     Map<Marker, String> markers;
@@ -131,7 +139,7 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
         mMap.setInfoWindowAdapter(new TripBookInfoWindow());
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -145,16 +153,16 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
     }
 
 
-    public void getLocations(final Location curLocation){
+    public void getLocations(final Location curLocation) {
         mLocationsArrayList.clear();
         DatabaseReference ref = mDatabase.getReference(com.nikogalla.tripbook.models.Location.LOCATION_TABLE_NAME);
         ref.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 com.nikogalla.tripbook.models.Location location = dataSnapshot.getValue(com.nikogalla.tripbook.models.Location.class);
-                int distance = LocationUtils.getLocationDistanceFromMyLocation(location,curLocation);
+                int distance = LocationUtils.getLocationDistanceFromMyLocation(location, curLocation);
                 location.distance = distance;
-                if (LocationUtils.isLocationDistanceInRange(distance,mContext)){
+                if (LocationUtils.isLocationDistanceInRange(distance, mContext)) {
                     mLocationsArrayList.add(location);
                     location.setKey(dataSnapshot.getKey());
                 }
@@ -162,17 +170,17 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.v(TAG,"Child changed");
+                Log.v(TAG, "Child changed");
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.v(TAG,"Child removed");
+                Log.v(TAG, "Child removed");
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Log.v(TAG,"Child moved");
+                Log.v(TAG, "Child moved");
             }
 
             @Override
@@ -183,22 +191,22 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Done with the initial loading
-                if (mLocationsArrayList.size() ==0){
+                if (mLocationsArrayList.size() == 0) {
 
-                }else{
-                    Collections.sort(mLocationsArrayList,new LocationUtils.LocationDistanceComparator());
+                } else {
+                    Collections.sort(mLocationsArrayList, new LocationUtils.LocationDistanceComparator());
                     // Saving location locally for widget
-                    LocationDbHelper.saveLocationsLocally(mLocationsArrayList,mContext);
+                    LocationDbHelper.saveLocationsLocally(mLocationsArrayList, mContext);
                     TripbookSyncAdapter.updateWidgets(mContext);
                     int locIndex = 0;
-                    for (com.nikogalla.tripbook.models.Location l: mLocationsArrayList){
+                    for (com.nikogalla.tripbook.models.Location l : mLocationsArrayList) {
                         marker = new LatLng(l.latitude, l.longitude);
                         Marker m = mMap.addMarker(new MarkerOptions()
                                 .title(l.name)
                                 .position(marker));
                         m.setSnippet(l.key);
                         markers.put(m, l.key);
-                        locIndex ++;
+                        locIndex++;
                     }
                 }
             }
@@ -214,20 +222,30 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
     public void onInfoWindowClick(Marker marker) {
         String locationId = marker.getSnippet();
         String locationName = marker.getTitle();
-        Intent intent = new Intent(mContext,LocationDetailsActivity.class);
-        intent.putExtra(getString(R.string.location_key_id),locationId);
-        intent.putExtra(getString(R.string.location_name_id),locationName);
+        Intent intent = new Intent(mContext, LocationDetailsActivity.class);
+        intent.putExtra(getString(R.string.location_key_id), locationId);
+        intent.putExtra(getString(R.string.location_name_id), locationName);
         startActivity(intent);
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        try{
-            currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), MAP_ZOOM));
-            getLocations(currentLocation);
+        try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), MAP_ZOOM));
+                getLocations(currentLocation);
+                return;
+            }
         }catch (Exception e){
-            Log.d(TAG,e.getMessage());
+            Log.d(TAG,"Error getting location: " + e.getMessage());
         }
     }
 
@@ -242,9 +260,11 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
     }
 
     private class TripBookInfoWindow implements GoogleMap.InfoWindowAdapter {
-        private final View infoWindow;
+        private View infoWindow;
         private final ImageView ivLocation;
-        private final TextView tvLocationName,tvLocationAddress;
+        private TextView tvLocationName,tvLocationAddress;
+        com.nikogalla.tripbook.models.Location currentLocation;
+
         public TripBookInfoWindow() {
             infoWindow = getLayoutInflater().inflate(R.layout.item_location_info_window,null);
             ivLocation = (ImageView) infoWindow.findViewById(R.id.ivLocation);
@@ -254,24 +274,26 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
 
         @Override
         public View getInfoWindow(final Marker marker) {
+            currentLocation = new com.nikogalla.tripbook.models.Location();
+            for (com.nikogalla.tripbook.models.Location l : mLocationsArrayList) {
+                if (marker.getTitle().matches(l.name)) {
+                    currentLocation = l;
+                    break;
+                }
+            }
             return null;
         }
 
         @Override
         public View getInfoContents(Marker marker) {
-            for (com.nikogalla.tripbook.models.Location l : mLocationsArrayList){
-                if (marker.getTitle().matches(l.name)){
-                    tvLocationName.setText(l.name);
-                    tvLocationAddress.setText(l.address);
-                    if (NetworkUtils.isOnline(mContext)){
-                        Picasso.with(mContext).load(l.getMainPhotoUrl()).into(ivLocation);
-                    }else{
-                        Picasso.with(mContext).load(l.getMainPhotoUrl()).networkPolicy(NetworkPolicy.OFFLINE).into(ivLocation);
-                        Log.v(TAG,"no connection, loading local images");
-                    }
-                }
+            if (currentLocation!=null){
+                tvLocationName.setText(currentLocation.name);
+                tvLocationAddress.setText(currentLocation.address);
+                Bitmap bitmap = new ImageUtils(currentLocation,mContext).getLocalBitmapForLocation();
+                ivLocation.setImageBitmap(bitmap);
             }
             return infoWindow;
         }
     }
+
 }

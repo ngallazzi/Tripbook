@@ -5,4 +5,9 @@
     <string name="google_play_services_unavailable">Google play services not available</string>
     <string name="add_location_error">Unable to add location, check your internet connection</string>
     <string name="duplicate_location_name">This location already exists!</string>
+
+    <string name="sign_in_canceled">Sign in canceled</string>
+    <string name="no_network">No network</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="location_disabled">Please enable locations from your settings</string>
 </resources>

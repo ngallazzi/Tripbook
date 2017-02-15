@@ -22,6 +22,9 @@ public class LocationProvider extends ContentProvider {
     private LocationDbHelper mOpenHelper;
 
     static final int LOCATION = 100;
+    static final int USER = 101;
+    static final int USER_BY_UID = 102;
+    private static final String userWithUIDSelection = LocationContract.UserEntry.TABLE_NAME + "." + LocationContract.UserEntry.COLUMN_UID + " = ?";
 
     @Override
     public boolean onCreate() {
@@ -41,7 +44,8 @@ public class LocationProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, LocationContract.PATH_LOCATION, LOCATION);
-
+        matcher.addURI(authority, LocationContract.PATH_USER, USER);
+        matcher.addURI(authority, LocationContract.PATH_USER + "/*", USER_BY_UID);
         return matcher;
     }
 
@@ -54,6 +58,14 @@ public class LocationProvider extends ContentProvider {
                 retCursor = mOpenHelper.getReadableDatabase().query(LocationContract.LocationEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             }
+            case USER: {
+                retCursor = mOpenHelper.getReadableDatabase().query(LocationContract.UserEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            }
+            case USER_BY_UID: {
+                retCursor = getUserByUserUID(uri,projection);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -61,6 +73,11 @@ public class LocationProvider extends ContentProvider {
         return retCursor;
     }
 
+    private Cursor getUserByUserUID(Uri uri, String[] projection){
+        String userUID = LocationContract.UserEntry.getUserUidFromUri(uri);
+        Cursor cursor = mOpenHelper.getReadableDatabase().query(LocationContract.UserEntry.TABLE_NAME, projection, userWithUIDSelection, new String[]{userUID}, null, null, null);
+        return cursor;
+    }
 
     @Nullable
     @Override
@@ -72,6 +89,10 @@ public class LocationProvider extends ContentProvider {
             // Student: Uncomment and fill out these two cases
             case LOCATION:
                 return LocationContract.LocationEntry.CONTENT_TYPE;
+            case USER:
+                return LocationContract.UserEntry.CONTENT_TYPE;
+            case USER_BY_UID:
+                return LocationContract.UserEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -93,6 +114,14 @@ public class LocationProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
+            case USER: {
+                long _id = db.insert(LocationContract.UserEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = LocationContract.UserEntry.buildUserUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -110,6 +139,10 @@ public class LocationProvider extends ContentProvider {
         switch (match) {
             case LOCATION: {
                 rowsDeleted = db.delete(LocationContract.LocationEntry.TABLE_NAME,selection,selectionArgs);
+                break;
+            }
+            case USER: {
+                rowsDeleted = db.delete(LocationContract.UserEntry.TABLE_NAME,selection,selectionArgs);
                 break;
             }
             default:
@@ -138,6 +171,10 @@ public class LocationProvider extends ContentProvider {
         switch (match) {
             case LOCATION: {
                 rowsUpdated = db.update(LocationContract.LocationEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            }
+            case USER: {
+                rowsUpdated = db.update(LocationContract.UserEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             }
             default:

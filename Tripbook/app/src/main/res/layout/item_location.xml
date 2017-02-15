@@ -43,6 +43,7 @@
                 android:paddingBottom="@dimen/destination_title_vertical_padding"
                 android:maxLines="1"
                 android:ellipsize="end"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:text="@string/destination_name_placeholder" />
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -64,6 +65,7 @@
                         android:id="@+id/tvLocationComments"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="@style/Base.TextAppearance.AppCompat.Subhead"
                         android:text="@string/no_comments" />
                 </LinearLayout>
                 <LinearLayout
@@ -80,6 +82,7 @@
                         android:id="@+id/tvLocationRates"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        style="@style/Base.TextAppearance.AppCompat.Subhead"
                         android:text="@string/no_rate" />
                 </LinearLayout>
             </LinearLayout>
@@ -88,7 +91,7 @@
             android:id="@+id/ibLocationShare"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/tw__transparent"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/share_location"
             android:src="@drawable/ic_share_light" />
     </LinearLayout>

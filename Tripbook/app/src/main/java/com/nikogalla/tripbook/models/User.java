@@ -7,19 +7,21 @@ import java.util.Date;
  */
 
 public class User {
-    public int id;
+    public String UID;
+    public String email;
+    public String provider;
     public String name;
     public String pictureUrl;
-    public String createdOn;
 
     public User() {
 
     }
 
-    public User(String createdOn, int id, String name, String pictureUrl) {
-        this.createdOn = createdOn;
-        this.id = id;
+    public User(String email, String name, String pictureUrl, String provider, String UID) {
+        this.email = email;
         this.name = name;
         this.pictureUrl = pictureUrl;
+        this.provider = provider;
+        this.UID = UID;
     }
 }

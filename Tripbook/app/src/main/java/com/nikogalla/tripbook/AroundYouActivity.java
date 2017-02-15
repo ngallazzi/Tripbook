@@ -1,12 +1,10 @@
 package com.nikogalla.tripbook;
 
 import android.Manifest;
-import android.accounts.Account;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Parcelable;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -27,6 +25,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -36,18 +35,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nikogalla.tripbook.data.FirebaseHelper;
-import com.nikogalla.tripbook.data.LocationContract;
 import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.models.Location;
-import com.nikogalla.tripbook.prefs.PreferencesUtils;
 import com.nikogalla.tripbook.prefs.SettingsActivity;
 import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
+import com.nikogalla.tripbook.utils.ImageUtils;
 import com.nikogalla.tripbook.utils.LocationUtils;
 import com.nikogalla.tripbook.utils.StatusSnackBars;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -120,19 +117,14 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         mRvLocations.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0 ||dy<0 && fabAddLocation.isShown())
+                if (isLastItemDisplaying())
                 {
                     fabAddLocation.hide();
+                }else{
+                    if (fabAddLocation.getVisibility() == View.GONE || fabAddLocation.getVisibility() == View.INVISIBLE){
+                        fabAddLocation.show();
+                    }
                 }
-            }
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
-            {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE && !isLastItemDisplaying())
-                {
-                    fabAddLocation.show();
-                }
-
-                super.onScrollStateChanged(recyclerView, newState);
             }
         });
     }
@@ -184,6 +176,7 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                 location.distance = distance;
                 if (LocationUtils.isLocationDistanceInRange(distance,mContext)){
                     mLocationsArrayList.add(location);
+                    new ImageUtils(location,mContext).saveImageLocally();
                     location.setKey(dataSnapshot.getKey());
                 }
             }
@@ -267,6 +260,15 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                 return false;
             }
         });
+        MenuItem itemAccounts = menu.findItem(R.id.action_user_account);
+        itemAccounts.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(mContext,UserAccountInfoActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -284,12 +286,16 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             gpsLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            TripbookSyncAdapter.initializeSyncAdapter(mContext);
-            getLocations();
+            if (gpsLocation!=null){
+                TripbookSyncAdapter.initializeSyncAdapter(mContext);
+                getLocations();
+            }else{
+                tvNoLocationsFound.setText(getString(R.string.location_disabled));
+            }
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST_ID);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_ID);
         }
     }
 
