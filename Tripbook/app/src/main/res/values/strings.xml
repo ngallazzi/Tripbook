@@ -53,7 +53,10 @@
     <!-- TripbookSyncAdapter related -->
     <string name="sync_account_type" translatable="false">tripbook.nikogalla.com</string>
     <string name="content_authority" translatable="false">com.nikogalla.tripbook</string>
+
     <string name="alert_localization">Please, allow localization to have locations around you</string>
+    <string name="new_locations_found">I\'ve found %1$s locations around you!</string>
+    <string name="touch_to_see">Touch to see your next destinations</string>
     <!-- Sharing -->
     <string name="share_location">Share location</string>
     <string name="share_text">I\'m visiting %1$s with Tripbook!</string>

@@ -40,6 +40,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -203,6 +205,7 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
                         marker = new LatLng(l.latitude, l.longitude);
                         Marker m = mMap.addMarker(new MarkerOptions()
                                 .title(l.name)
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_marker))
                                 .position(marker));
                         m.setSnippet(l.key);
                         markers.put(m, l.key);

@@ -8,9 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
-
-import com.nikogalla.tripbook.models.Location;
 
 /**
  * Created by Nicola on 2017-02-03.

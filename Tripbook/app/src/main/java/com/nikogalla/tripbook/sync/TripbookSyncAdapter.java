@@ -3,6 +3,8 @@ package com.nikogalla.tripbook.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
@@ -11,11 +13,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.view.View;
 
@@ -29,6 +34,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nikogalla.tripbook.AroundYouActivity;
 import com.nikogalla.tripbook.R;
 import com.nikogalla.tripbook.data.FirebaseHelper;
 import com.nikogalla.tripbook.data.LocationContract;
@@ -52,13 +58,10 @@ public class TripbookSyncAdapter extends AbstractThreadedSyncAdapter {
     private static Context mContext;
     ArrayList<Location> mLocationArrayList = new ArrayList<>();
 
-    //public static final int SYNC_INTERVAL = 60*15; // Every 15 minutes
-    public static final int SYNC_INTERVAL = 30*60; // Every 30 minutes
-    public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
-    // Global variables
-    // Define a variable to contain a content resolver instance
-    ContentResolver mContentResolver;
     GpsLocationHelper mGpsLocationHelper;
+    int localLocationCount;
+    final int NEW_LOCATIONS_NOTIFICATION_ID = 1;
+    ContentResolver mContentResolver;
     /**
      * Set up the sync adapter
      */
@@ -68,17 +71,12 @@ public class TripbookSyncAdapter extends AbstractThreadedSyncAdapter {
          * If your app uses a content resolver, get an instance of it
          * from the incoming Context
          */
-        mContentResolver = context.getContentResolver();
         mContext = context;
         mDatabase = FirebaseHelper.getDatabase();
         mGpsLocationHelper = new GpsLocationHelper(mContext);
-        // Create an instance of GoogleAPIClient.
+        mContentResolver = context.getContentResolver();
     }
-    /**
-     * Set up the sync adapter. This form of the
-     * constructor maintains compatibility with Android 3.0
-     * and later platform versions
-     */
+
     public TripbookSyncAdapter(
             Context context,
             boolean autoInitialize,
@@ -88,41 +86,22 @@ public class TripbookSyncAdapter extends AbstractThreadedSyncAdapter {
          * If your app uses a content resolver, get an instance of it
          * from the incoming Context
          */
-        mContext = context;
         mContentResolver = context.getContentResolver();
+        mContext = context;
+        mDatabase = FirebaseHelper.getDatabase();
         mGpsLocationHelper = new GpsLocationHelper(mContext);
-    }
-
-    public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
-        Account account = getSyncAccount(context);
-        String authority = context.getString(R.string.content_authority);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            // we can enable inexact timers in our periodic sync
-            SyncRequest request = new SyncRequest.Builder().
-                    syncPeriodic(syncInterval, flexTime).
-                    setSyncAdapter(account, authority).
-                    setExtras(new Bundle()).build();
-            ContentResolver.requestSync(request);
-        } else {
-            ContentResolver.addPeriodicSync(account,
-                    authority, new Bundle(), syncInterval);
-        }
-    }
-
-    public static void initializeSyncAdapter(Context context) {
-        getSyncAccount(context);
+        mContentResolver = context.getContentResolver();
     }
 
     /**
      * Helper method to have the sync adapter sync immediately
      * @param context The context used to access the account service
      */
-    public static void syncImmediately(Context context) {
+    public static void syncImmediately(Context context, Account account) {
         Bundle bundle = new Bundle();
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
+        ContentResolver.requestSync(account, context.getString(R.string.content_authority), bundle);
     }
 
     @Override
@@ -186,6 +165,14 @@ public class TripbookSyncAdapter extends AbstractThreadedSyncAdapter {
                     LocationDbHelper.saveLocationsLocally(mLocationArrayList,mContext);
                     Log.v(TAG,"Location saved by sync adapter");
                     updateWidgets(mContext);
+                    Cursor cursor = mContext.getContentResolver().query(LocationContract.LocationEntry.CONTENT_URI,null,null,null,null);
+                    localLocationCount = cursor.getCount();
+                    Log.v(TAG,"Local location count: " + localLocationCount);
+                    Log.v(TAG,"Remote location count: " + mLocationArrayList.size());
+                    // Generate notification if data has changed
+                    if (localLocationCount!=mLocationArrayList.size()){
+                        generateNotification(localLocationCount);
+                    }
                 }
             }
 
@@ -201,60 +188,51 @@ public class TripbookSyncAdapter extends AbstractThreadedSyncAdapter {
         dataUpdatedIntent.setAction(ACTION_DATA_UPDATED);
         context.sendBroadcast(dataUpdatedIntent);
     }
-    /**
-     * Helper method to get the fake account to be used with SyncAdapter, or make a new one
-     * if the fake account doesn't exist yet.  If we make a new account, we call the
-     * onAccountCreated method so we can initialize things.
-     *
-     * @param context The context used to access the account service
-     * @return a fake account.
-     */
-    public static Account getSyncAccount(Context context) {
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
 
-        // Create the account type and default account
-        Account newAccount = new Account(
-                context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+    public void generateNotification(int locationCount){
+        if (locationCount>0){
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(mContext)
+                            .setSmallIcon(R.drawable.ic_tripbook_notification)
+                            .setContentTitle(mContext.getString(R.string.new_locations_found,String.valueOf(locationCount)))
+                            .setContentText(mContext.getString(R.string.touch_to_see));
+// Creates an explicit intent for an Activity in your app
+            Intent resultIntent = new Intent(mContext, AroundYouActivity.class);
 
-        // If the password doesn't exist, the account doesn't exist
-        if ( null == accountManager.getPassword(newAccount) ) {
-
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-            if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
-                return null;
-            }
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-
-            onAccountCreated(newAccount, context);
+// The stack builder object will contain an artificial back stack for the
+// started Activity.
+// This ensures that navigating backward from the Activity leads out of
+// your application to the Home screen.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
+// Adds the back stack for the Intent (but not the Intent itself)
+            stackBuilder.addParentStack(AroundYouActivity.class);
+// Adds the Intent that starts the Activity to the top of the stack
+            stackBuilder.addNextIntent(resultIntent);
+            PendingIntent resultPendingIntent =
+                    stackBuilder.getPendingIntent(
+                            0,
+                            PendingIntent.FLAG_UPDATE_CURRENT
+                    );
+            mBuilder.setContentIntent(resultPendingIntent);
+            NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+// mId allows you to update the notification later on.
+            mNotificationManager.notify(NEW_LOCATIONS_NOTIFICATION_ID, mBuilder.build());
         }
-        return newAccount;
     }
 
-    private static void onAccountCreated(Account newAccount, Context context) {
-    /*
-         * Since we've created an account
-         */
-        Log.v(TAG,"On account created");
-        TripbookSyncAdapter.configurePeriodicSync(context, SYNC_INTERVAL, SYNC_FLEXTIME);
-
-        /*
-         * Without calling setSyncAutomatically, our periodic sync will not be enabled.
-         */
-        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
-
-        /*
-         * Finally, let's do a sync to get things started
-         */
-        syncImmediately(context);
+    public static void configurePeriodicSync(Account account, Context context, int syncInterval, int flexTime) {
+        String authority = context.getString(R.string.content_authority);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // we can enable inexact timers in our periodic sync
+            SyncRequest request = new SyncRequest.Builder().
+                    syncPeriodic(syncInterval, flexTime).
+                    setSyncAdapter(account, authority).
+                    setExtras(new Bundle()).build();
+            ContentResolver.requestSync(request);
+        } else {
+            ContentResolver.addPeriodicSync(account,
+                    authority, new Bundle(), syncInterval);
+        }
     }
+
 }

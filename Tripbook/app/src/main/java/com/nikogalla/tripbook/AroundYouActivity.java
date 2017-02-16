@@ -1,6 +1,9 @@
 package com.nikogalla.tripbook;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -50,7 +53,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class AroundYouActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private final String TAG = AroundYouActivity.class.getSimpleName();
+    private static final String TAG = AroundYouActivity.class.getSimpleName();
     @BindView(R.id.clActivityAroundYouContainer)
     CoordinatorLayout clActivityAroundYouContainer;
     @BindView(R.id.tbAroundYou)
@@ -72,6 +75,13 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     GoogleApiClient mGoogleApiClient;
     android.location.Location gpsLocation;
     Parcelable listState;
+    Account mSyncAccount;
+    public static final long SECONDS_PER_MINUTE = 60L;
+    public static final long SYNC_INTERVAL_IN_MINUTES = 30L; // every 30 minutes
+    public static final long SYNC_INTERVAL =
+            SYNC_INTERVAL_IN_MINUTES *
+                    SECONDS_PER_MINUTE;
+    ContentResolver mResolver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +109,9 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                     .addApi(LocationServices.API)
                     .build();
         }
+        mSyncAccount = CreateSyncAccount(mContext);
+        mResolver = getContentResolver();
+        TripbookSyncAdapter.configurePeriodicSync(mSyncAccount,mContext,3*3600,20*60); // Sync every 3 hours with 20 minutes of flex
         initRecyclerView();
     }
 
@@ -210,8 +223,7 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                }else{
                    Collections.sort(mLocationsArrayList,new LocationUtils.LocationDistanceComparator());
                    // Saving location locally for widget
-                   LocationDbHelper.saveLocationsLocally(mLocationsArrayList,mContext);
-                   TripbookSyncAdapter.updateWidgets(mContext);
+                   TripbookSyncAdapter.syncImmediately(mContext,mSyncAccount);
                    mLocationsAdapter.notifyDataSetChanged();
                    tvNoLocationsFound.setVisibility(View.GONE);
                    mRvLocations.setVisibility(View.VISIBLE);
@@ -289,7 +301,6 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             gpsLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             if (gpsLocation!=null){
-                TripbookSyncAdapter.initializeSyncAdapter(mContext);
                 getLocations();
             }else{
                 tvNoLocationsFound.setText(getString(R.string.location_disabled));
@@ -308,7 +319,11 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     gpsLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                    getLocations();
+                    if (gpsLocation!=null){
+                        getLocations();
+                    }else{
+                        tvNoLocationsFound.setText(getString(R.string.location_disabled));
+                    }
                 }else{
                     Toast.makeText(mContext,getString(R.string.alert_localization),Toast.LENGTH_SHORT).show();
                 }
@@ -316,6 +331,7 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
             }
         }
     }
+
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -340,5 +356,36 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         if (savedInstanceState != null) {
             listState = savedInstanceState.getParcelable(SAVED_RECYCLER_VIEW_STATUS_ID);
         }
+    }
+
+    public static Account CreateSyncAccount(Context context) {
+        // Create the account type and default account
+        Account newAccount = new Account(context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+        // Get an instance of the Android account manager
+        AccountManager accountManager =
+                (AccountManager) context.getSystemService(
+                        ACCOUNT_SERVICE);
+        /*
+         * Add the account and account type, no password or user data
+         * If successful, return the Account object, otherwise report an error.
+         */
+        if ( null == accountManager.getPassword(newAccount) ) {
+            if (accountManager.addAccountExplicitly(newAccount, null, null)) {
+            /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call context.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+            } else {
+                Log.d(TAG,"Account already exists");
+            /*
+             * The account exists or some other error occurred. Log this, report it,
+             * or handle it internally.
+             * Log.
+             */
+            }
+        }
+        return newAccount;
     }
 }
