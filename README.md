@@ -2,10 +2,11 @@
 
 An app to get some trip ideas for the weekend, displaying places and things to visit around you. With Tripbook your weekends will never be boring anymore. Get inspired by a community of travelers like you, propose new destinations and rate the ones proposed by the other users.
 
+Project's doc: https://docs.google.com/document/d/1w0QrG-Z5LH0wyWIGkTPDJ9ig0Q7iG1PsrYMBND3bnUg/edit?usp=sharing
+
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-If no location shows up in the first activity, change distance range in app Preferences
+Clone repository and open project in Android Studio
 
 ### Prerequisites
 
@@ -21,6 +22,7 @@ Facebook test account:
 email : tripbookuser_siddazw_a@tfbnw.net
 pwd: tripbook.2017
 
+Google account: a valid google account
 
 ## Authors
 
