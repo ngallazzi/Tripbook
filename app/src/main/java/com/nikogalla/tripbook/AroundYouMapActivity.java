@@ -252,7 +252,7 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), MAP_ZOOM));
                     getLocations(currentLocation);
                 }else{
-                    StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clMapContainer,AroundYouMapActivity.this).show();
+                    StatusSnackBars.getErrorSnackBar(getString(R.string.alert_localization),clMapContainer,AroundYouMapActivity.this).show();
                 }
                 return;
             }

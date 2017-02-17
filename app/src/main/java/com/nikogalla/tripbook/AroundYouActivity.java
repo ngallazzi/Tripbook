@@ -148,13 +148,6 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     }
 
     @Override
-    protected void onStart() {
-        // Connect the client.
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
-
-    @Override
     protected void onStop() {
         mGoogleApiClient.disconnect();
         super.onStop();
@@ -170,10 +163,9 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     @Override
     protected void onResume() {
         super.onResume();
-        if (gpsLocation!=null){
-            getLocations();
+        if (!mGoogleApiClient.isConnected()){
+            mGoogleApiClient.connect();
         }
-        // restore RecyclerView state
     }
 
     public void getLocations(){
