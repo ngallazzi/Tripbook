@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -169,6 +170,9 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
     @Override
     protected void onResume() {
         super.onResume();
+        if (gpsLocation!=null){
+            getLocations();
+        }
         // restore RecyclerView state
     }
 
@@ -206,7 +210,7 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clActivityAroundYouContainer).show();
+                StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clActivityAroundYouContainer,AroundYouActivity.this).show();
             }
         });
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -298,7 +302,7 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
             if (gpsLocation!=null){
                 getLocations();
             }else{
-                tvNoLocationsFound.setText(getString(R.string.location_disabled));
+                StatusSnackBars.getErrorSnackBar(getString(R.string.alert_localization),clActivityAroundYouContainer,this).show();
             }
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_ID);
@@ -317,10 +321,10 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
                     if (gpsLocation!=null){
                         getLocations();
                     }else{
-                        tvNoLocationsFound.setText(getString(R.string.location_disabled));
+                        StatusSnackBars.getErrorSnackBar(getString(R.string.alert_localization),clActivityAroundYouContainer,this).show();
                     }
                 }else{
-                    Toast.makeText(mContext,getString(R.string.alert_localization),Toast.LENGTH_SHORT).show();
+                    StatusSnackBars.getErrorSnackBar(getString(R.string.alert_localization),clActivityAroundYouContainer,this).show();
                 }
                 return;
             }
@@ -330,12 +334,12 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        Log.v(TAG,"Connection suspended");
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        StatusSnackBars.getErrorSnackBar(getString(R.string.alert_localization),clActivityAroundYouContainer,this).show();
     }
 
     @Override

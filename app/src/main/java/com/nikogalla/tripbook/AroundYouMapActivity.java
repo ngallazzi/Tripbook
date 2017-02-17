@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -88,6 +89,8 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
     Context mContext;
     LatLng marker;
     private GoogleMap mMap;
+    @BindView(R.id.clMapContainer)
+    CoordinatorLayout clMapContainer;
     @BindView(R.id.tbAroundYouMap)
     Toolbar tbAroundYouMap;
     @BindView(R.id.llMapSelection)
@@ -245,8 +248,12 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
                 // to handle the case where the user grants the permission. See the documentation
                 // for ActivityCompat#requestPermissions for more details.
                 currentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), MAP_ZOOM));
-                getLocations(currentLocation);
+                if (currentLocation!=null){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), MAP_ZOOM));
+                    getLocations(currentLocation);
+                }else{
+                    StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clMapContainer,AroundYouMapActivity.this).show();
+                }
                 return;
             }
         }catch (Exception e){
@@ -261,7 +268,7 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clMapContainer,AroundYouMapActivity.this).show();
     }
 
     private class TripBookInfoWindow implements GoogleMap.InfoWindowAdapter {
