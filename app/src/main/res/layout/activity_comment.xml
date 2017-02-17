@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/tbAddComment"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:background="@color/divider"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvLocationComments"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/comment_list_item_padding"
+        android:layout_weight="1"
+        tools:listitem="@layout/item_comment">
+    </android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/divider_height"
+        android:paddingBottom="@dimen/divider_height"
+        android:gravity="center_vertical">
+        <ImageButton
+            android:background="@color/tw__transparent"
+            android:src="@drawable/ic_comments_green"
+            android:contentDescription="@string/comment_image_hint"
+            android:layout_width="@dimen/comment_bar_height"
+            android:layout_height="@dimen/comment_bar_height" />
+        <EditText
+            android:id="@+id/etAddComment"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/add_comment"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            />
+        <ImageButton
+            android:id="@+id/ibAddComment"
+            android:background="@color/primary"
+            android:src="@drawable/ic_confirm_comment"
+            android:contentDescription="@string/add_comment_button_hint"
+            android:layout_width="@dimen/comment_bar_height"
+            android:layout_height="@dimen/comment_bar_height" />
+    </LinearLayout>
+</LinearLayout>

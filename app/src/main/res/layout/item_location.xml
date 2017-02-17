@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llItemLocationContainer"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/destination_card_height"
+    android:theme="@style/LocationTitle"
+    android:layout_marginBottom="@dimen/activity_vertical_margin">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end">
+        <ImageView
+            android:id="@+id/ivLocation"
+            android:contentDescription="@string/image_placeholder"
+            android:transitionName="@string/shared_element_transition_id"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/destination_card_image_height"
+            android:scaleType="centerCrop"
+            android:src="@drawable/camera_placeholder" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/destination_card_title_height"
+        android:gravity="center_vertical"
+        android:background="@color/primary"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/activity_horizontal_margin"
+        android:paddingEnd="@dimen/activity_horizontal_margin">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tvLocationName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingTop="@dimen/destination_title_vertical_padding"
+                android:paddingBottom="@dimen/destination_title_vertical_padding"
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:maxLines="1"
+                android:ellipsize="end"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:text="@string/destination_name_placeholder" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="@dimen/destination_title_vertical_padding">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingEnd="@dimen/destination_title_horizontal_padding"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_comments_light"
+                        android:contentDescription="@string/comment_image_hint"
+                        android:cropToPadding="false" />
+                    <TextView
+                        android:id="@+id/tvLocationComments"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Base.TextAppearance.AppCompat.Subhead"
+                        android:text="@string/no_comments" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/rate_image_hint"
+                        android:src="@drawable/ic_rate_orange" />
+                    <TextView
+                        android:id="@+id/tvLocationRates"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Base.TextAppearance.AppCompat.Subhead"
+                        android:text="@string/no_rate" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+        <ImageButton
+            android:id="@+id/ibLocationShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/share_location"
+            android:src="@drawable/ic_share_light" />
+    </LinearLayout>
+
+</LinearLayout>
