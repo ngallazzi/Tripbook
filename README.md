@@ -16,7 +16,7 @@ Android 4.4 APIs or higher
 
 From Android Studio --> Gradle --> "Task installRelease"
 
-App release available here: https://github.com/ngallazzi/Capstone-Project/blob/master/app/app-release.apk
+App release available here: hhttps://github.com/ngallazzi/Capstone-Project/blob/master/app/Tripbook-release.apk
 
 ## Running the tests
 
