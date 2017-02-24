@@ -4,6 +4,16 @@ An app to get some trip ideas for the weekend, displaying places and things to v
 
 Project's doc: https://docs.google.com/document/d/1w0QrG-Z5LH0wyWIGkTPDJ9ig0Q7iG1PsrYMBND3bnUg/edit?usp=sharing
 
+<div>
+  <img src="https://raw.githubusercontent.com/ngallazzi/Capstone-Project/master/docs/Screenshots/login.png" width="250" hspace="20" />
+  <img src="https://github.com/ngallazzi/Capstone-Project/blob/master/docs/Screenshots/around_you.jpg?raw=true" width="250" hspace="20"/>
+  <img src="https://github.com/ngallazzi/Capstone-Project/blob/master/docs/Screenshots/around_you_map.jpg?raw=true" width="250" hspace="20" />
+  </br>
+  <img src="https://github.com/ngallazzi/Capstone-Project/blob/master/docs/Screenshots/location_details.jpg?raw=true" width="250" hspace="20" />
+    <img src="https://github.com/ngallazzi/Capstone-Project/blob/master/docs/Screenshots/comments.png?raw=true" width="250" hspace="20" />
+      <img src="https://github.com/ngallazzi/Capstone-Project/blob/master/docs/Screenshots/add_location.jpg?raw=true" width="250" hspace="20" />
+</div>
+
 ## Getting Started
 
 Clone repository and open project in Android Studio
