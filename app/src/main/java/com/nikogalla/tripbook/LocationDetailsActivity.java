@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -55,6 +56,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
     LinearLayout llComments;
     @BindView(R.id.llRates)
     LinearLayout llRates;
+    @BindView(R.id.ibDirections)
+    ImageButton ibDirections;
     FirebaseDatabase mDatabase;
     private String mLocationKey;
     Location mLocation;
@@ -98,6 +101,12 @@ public class LocationDetailsActivity extends AppCompatActivity {
                         Intent intent = new Intent(mContext,CommentActivity.class);
                         intent.putExtra(getString(R.string.location_id),mLocation);
                         startActivity(intent);
+                    }
+                });
+                ibDirections.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        attemptGoogleMapsLaunch();
                     }
                 });
             }
@@ -172,5 +181,23 @@ public class LocationDetailsActivity extends AppCompatActivity {
     public void deleteCurrentLocation(){
         DatabaseReference locationRef = mDatabase.getReference(Location.LOCATION_TABLE_NAME);
         locationRef.child(mLocationKey).removeValue();
+    }
+
+    public void attemptGoogleMapsLaunch(){
+        // Create a Uri from an intent string. Use the result to create an Intent.
+
+        Uri gmmIntentUri = Uri.parse("google.navigation:q="+ mLocation.latitude
+                +","+ mLocation.longitude+"");
+
+// Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+// Make the Intent explicit by setting the Google Maps package
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+// Attempt to start an activity that can handle the Intent
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }
+
     }
 }

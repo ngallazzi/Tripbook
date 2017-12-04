@@ -47,25 +47,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <LinearLayout
+                android:id="@+id/llDirectionsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/destination_title_vertical_padding"
+                android:gravity="center_vertical"
                 android:paddingBottom="@dimen/destination_title_vertical_padding"
-                android:gravity="center_vertical">
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/destination_title_vertical_padding">
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/address_icon"
                     android:layout_marginEnd="@dimen/destination_title_horizontal_padding"
+                    android:contentDescription="@string/address_icon"
                     android:src="@drawable/ic_address" />
+
                 <TextView
                     android:id="@+id/tvLocationAddress"
-                    android:layout_width="wrap_content"
                     style="@style/Base.TextAppearance.AppCompat.Subhead"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content" />
+                <ImageButton
+                    android:id="@+id/ibDirections"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="null"
+                    android:src="@drawable/ic_directions"
+                    android:tint="@color/accent"
+                    />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
