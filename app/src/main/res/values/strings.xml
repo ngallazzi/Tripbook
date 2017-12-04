@@ -49,6 +49,8 @@
     <string name="select_from_gallery">Select from gallery</string>
     <string name="shared_element_transition_id" translatable="false">shared_el_transition_id</string>
     <string name="settings">Settings</string>
+    <string name="my_position">My position</string>
+    <string name="add_tag">Add tag</string>
     <!-- Account type (for sync-adapter authenticator) -->
     <!-- TripbookSyncAdapter related -->
     <string name="sync_account_type" translatable="false">tripbook.nikogalla.com</string>

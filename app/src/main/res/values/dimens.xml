@@ -5,6 +5,7 @@
     <dimen name="destination_title_horizontal_padding">8dp</dimen>
     <dimen name="destination_title_vertical_padding">8dp</dimen>
     <dimen name="comment_list_item_padding">8dp</dimen>
+    <dimen name="edit_text_drawable_padding">8dp</dimen>
     <dimen name="destination_card_height">256dp</dimen>
     <dimen name="destination_card_image_height">192dp</dimen>
     <dimen name="destination_card_title_height">64dp</dimen>

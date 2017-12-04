@@ -51,13 +51,16 @@
             android:name=".CommentActivity"
             android:parentActivityName=".LocationDetailsActivity" />
         <activity
-            android:name=".AddLocationActivity"
+            android:name=".adding.AddLocationActivity"
             android:parentActivityName=".AroundYouActivity" />
         <activity
             android:name=".RateActivity"
             android:parentActivityName=".LocationDetailsActivity" />
         <activity
             android:name=".prefs.SettingsActivity"
+            android:parentActivityName=".AroundYouActivity" />
+        <activity
+            android:name=".adding.AddTagActivity"
             android:parentActivityName=".AroundYouActivity" />
 
         <activity android:name=".UserAccountInfoActivity"

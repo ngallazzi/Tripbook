@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,11 +24,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -38,8 +35,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.nikogalla.tripbook.adding.AddLocationActivity;
+import com.nikogalla.tripbook.adding.AddTagActivity;
 import com.nikogalla.tripbook.data.FirebaseHelper;
-import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.prefs.SettingsActivity;
 import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
@@ -268,6 +266,15 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 Intent intent = new Intent(mContext,UserAccountInfoActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        });
+        MenuItem itemTags = menu.findItem(R.id.action_add_tag);
+        itemTags.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(mContext,AddTagActivity.class);
                 startActivity(intent);
                 return false;
             }

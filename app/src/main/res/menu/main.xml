@@ -19,6 +19,11 @@
         android:icon="@drawable/ic_map"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/action_add_tag"
+        android:orderInCategory="105"
+        android:title="@string/add_tag"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_logout"
         android:orderInCategory="103"
         android:title="@string/action_logout"

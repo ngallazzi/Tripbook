@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/clActivityAddTagContainer"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingStart="@dimen/activity_horizontal_margin"
+    android:paddingEnd="@dimen/activity_horizontal_margin"
+    android:layout_height="match_parent">
+    <com.pchmn.materialchips.ChipsInput
+        android:id="@+id/ciSelectTag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:hint="Enter a name"
+        app:maxRows="3"
+        app:chip_hasAvatarIcon="true"
+        app:chip_deletable="false" />
+</android.support.design.widget.CoordinatorLayout>

@@ -60,6 +60,8 @@ dependencies {
     compile 'com.mobsandgeeks:android-saripaar:2.0.3'
     // Progress bar library
     compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
+    // Chip-tag cloud
+    compile 'com.github.pchmn:MaterialChipsInput:1.0.8'
     testCompile 'junit:junit:4.12'
 }
 
