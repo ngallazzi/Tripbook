@@ -1,5 +1,0 @@
-- my location in adding new location
-- check crashes in location adding when rotating the screen
-- use wikipedia api to get description
-- implement photo gallery for location
-- add italian language

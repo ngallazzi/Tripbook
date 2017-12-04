@@ -164,6 +164,9 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         if (!mGoogleApiClient.isConnected()){
             mGoogleApiClient.connect();
         }
+        if (gpsLocation!=null) {
+            getLocations();
+        }
     }
 
     public void getLocations(){
@@ -386,4 +389,6 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         }
         return newAccount;
     }
+
+
 }

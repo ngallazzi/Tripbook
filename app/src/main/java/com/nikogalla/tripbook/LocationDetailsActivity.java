@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -108,7 +109,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                Toast.makeText(mContext, R.string.location_removed,Toast.LENGTH_SHORT).show();
+                finish();
             }
 
             @Override
@@ -147,13 +149,28 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            supportFinishAfterTransition();
-            finish();
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_delete_location:
+                deleteCurrentLocation();
+                return true;
+            case android.R.id.home:
+                supportFinishAfterTransition();
+                finish();
+                return true;
         }
-        return super.onOptionsItemSelected(item);
 
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.current_location, menu);
+        return true;
+    }
+
+    public void deleteCurrentLocation(){
+        DatabaseReference locationRef = mDatabase.getReference(Location.LOCATION_TABLE_NAME);
+        locationRef.child(mLocationKey).removeValue();
     }
 }
