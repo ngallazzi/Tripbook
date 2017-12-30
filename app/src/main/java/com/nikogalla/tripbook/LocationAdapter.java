@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,13 +21,20 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.prefs.PreferencesUtils;
 import com.nikogalla.tripbook.utils.DistanceUtils;
 import com.nikogalla.tripbook.utils.NetworkUtils;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,7 +57,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         // each data item is just a string in this case
         public LinearLayout llItemLocationContainer;
         public TextView tvLocationName,tvLocationComments,tvLocationRates;
-        public ImageView ivLocation,ibLocationShare;
+        public ImageView ivLocation,ibLocationDelete;
         public ViewHolder(View v) {
             super(v);
             llItemLocationContainer = (LinearLayout) v.findViewById(R.id.llItemLocationContainer);
@@ -57,7 +65,7 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
             tvLocationComments = (TextView) v.findViewById(R.id.tvLocationComments);
             tvLocationRates = (TextView) v.findViewById(R.id.tvLocationRates);
             ivLocation = (ImageView) v.findViewById(R.id.ivLocation);
-            ibLocationShare = (ImageButton) v.findViewById(R.id.ibLocationShare);
+            ibLocationDelete = (ImageButton) v.findViewById(R.id.ibLocationDelete);
         }
     }
 
@@ -102,16 +110,18 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
                 mContext.startActivity(intent, options.toBundle());
             }
         });
-        holder.ibLocationShare.setOnClickListener(new View.OnClickListener() {
+        holder.ibLocationDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Get access to the URI for the bitmap
-                Uri bmpUri = getLocalBitmapUri(holder.ivLocation, location.name);
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_TEXT, mContext.getString(R.string.share_text,location.name));
-                intent.putExtra(Intent.EXTRA_STREAM, bmpUri);
-                intent.setType("image/*");
-                mContext.startActivity(Intent.createChooser(intent, mContext.getString(R.string.share_intent)));
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance()
+                        .getReference(Location.LOCATION_TABLE_NAME);
+                mDatabase.child(location.key).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(mContext,"Location removed", Toast.LENGTH_SHORT).show();
+                        EventBus.getDefault().post(mContext.getString(R.string.location_removed));
+                    }
+                });
             }
         });
     }

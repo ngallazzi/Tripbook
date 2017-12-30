@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.wearable.MessageEvent;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -44,6 +45,10 @@ import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
 import com.nikogalla.tripbook.utils.ImageUtils;
 import com.nikogalla.tripbook.utils.LocationUtils;
 import com.nikogalla.tripbook.utils.StatusSnackBars;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -145,9 +150,23 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         return false;
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(String event) {
+        if (event.matches(getString(R.string.location_removed))){
+            getLocations();
+        }
+        /* Do something */};
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
     @Override
     protected void onStop() {
         mGoogleApiClient.disconnect();
+        EventBus.getDefault().unregister(this);
         super.onStop();
     }
 
