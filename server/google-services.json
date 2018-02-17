@@ -1,0 +1,115 @@
+{
+  "project_info": {
+    "project_number": "737477787602",
+    "firebase_url": "https://tripbook-aa611.firebaseio.com",
+    "project_id": "tripbook-aa611",
+    "storage_bucket": "tripbook-aa611.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:737477787602:android:74003e3f243eea07",
+        "android_client_info": {
+          "package_name": "com.nikogalla.tripbook"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "737477787602-h01d4h72kfo23dk54utc376nktic5nll.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nikogalla.tripbook",
+            "certificate_hash": "7a6ff9d78555c68f779ede2f851e08246e4749b7"
+          }
+        },
+        {
+          "client_id": "737477787602-ueiamjv3v1ssvld52q2r808ejtf6jrst.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nikogalla.tripbook",
+            "certificate_hash": "4837b67e4349963e06aa8fb08d6f008ba5415781"
+          }
+        },
+        {
+          "client_id": "737477787602-v0c226m9o0m96s4oae7mhuusabp80f1h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nikogalla.tripbook",
+            "certificate_hash": "b51063c4dbac8ce095fd23e5e92d5b633b0661fe"
+          }
+        },
+        {
+          "client_id": "737477787602-fhvcdpc8rk9p0qr224lvgoheihtgg19o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8fcffuI_ctLHoETb-r5IUVyIjskvrOqc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "737477787602-fhvcdpc8rk9p0qr224lvgoheihtgg19o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:737477787602:android:c11989f27eb3019f",
+        "android_client_info": {
+          "package_name": "com.nikogalla.tripbook.admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "737477787602-vvm7emaptobihe53m3qis98lsotn3nu9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nikogalla.tripbook.admin",
+            "certificate_hash": "7a6ff9d78555c68f779ede2f851e08246e4749b7"
+          }
+        },
+        {
+          "client_id": "737477787602-fhvcdpc8rk9p0qr224lvgoheihtgg19o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8fcffuI_ctLHoETb-r5IUVyIjskvrOqc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "737477787602-fhvcdpc8rk9p0qr224lvgoheihtgg19o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
