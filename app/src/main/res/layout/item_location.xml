@@ -7,7 +7,7 @@
     android:layout_height="@dimen/destination_card_height"
     android:theme="@style/LocationTitle"
     android:layout_marginBottom="@dimen/activity_vertical_margin">
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -20,7 +20,8 @@
             android:layout_height="@dimen/destination_card_image_height"
             android:scaleType="centerCrop"
             android:src="@drawable/camera_placeholder" />
-    </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/destination_card_title_height"

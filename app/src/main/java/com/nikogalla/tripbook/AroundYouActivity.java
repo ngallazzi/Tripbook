@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.nikogalla.tripbook.adding.AddLocationActivity;
 import com.nikogalla.tripbook.adding.AddTagActivity;
 import com.nikogalla.tripbook.data.FirebaseHelper;
@@ -86,6 +87,8 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         tbAroundYou.setTitle(getString(R.string.app_name) + " - " +getString(R.string.around_you));
         setSupportActionBar(tbAroundYou);
         mDatabase = FirebaseHelper.getDatabase();
+        FirebaseMessaging.getInstance().subscribeToTopic("messages");
+
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +108,7 @@ public class AroundYouActivity extends AppCompatActivity implements GoogleApiCli
         }
         mSyncAccount = CreateSyncAccount(mContext);
         mResolver = getContentResolver();
-        TripbookSyncAdapter.configurePeriodicSync(mSyncAccount,mContext,3*3600,20*60); // Sync every 3 hours with 20 minutes of flex
+        TripbookSyncAdapter.configurePeriodicSync(mSyncAccount,mContext); // Sync every 3 hours with 20 minutes of flex
         initRecyclerView();
     }
 

@@ -26,6 +26,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
+        buildTypes.each {
+            it.buildConfigField "String", "MESSAGE_ENDPOINT",
+                    "\"https://us-central1-tripbook-aa611.cloudfunctions.net/addMessage\""
+        }
     }
     repositories {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
@@ -37,6 +41,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     // Firebase
     compile 'com.firebaseui:firebase-ui-auth:1.1.1'
     compile 'com.google.firebase:firebase-database:10.0.1'
@@ -63,6 +68,9 @@ dependencies {
     // Chip-tag cloud
     compile 'com.github.pchmn:MaterialChipsInput:1.0.8'
     testCompile 'junit:junit:4.12'
+    // Networking
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+
 }
 
 // Add to the bottom of the file

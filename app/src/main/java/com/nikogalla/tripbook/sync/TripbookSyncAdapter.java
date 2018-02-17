@@ -57,6 +57,8 @@ public class TripbookSyncAdapter extends AbstractThreadedSyncAdapter {
     FirebaseDatabase mDatabase;
     private static Context mContext;
     ArrayList<Location> mLocationArrayList = new ArrayList<>();
+    private static final int PERIODIC_SYNC_INTERVAL = 60000;
+    private static final int FLEX_TIME = 60000;
 
     GpsLocationHelper mGpsLocationHelper;
     final int NEW_LOCATIONS_NOTIFICATION_ID = 1;
@@ -235,18 +237,18 @@ public class TripbookSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    public static void configurePeriodicSync(Account account, Context context, int syncInterval, int flexTime) {
+    public static void configurePeriodicSync(Account account, Context context) {
         String authority = context.getString(R.string.content_authority);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             // we can enable inexact timers in our periodic sync
             SyncRequest request = new SyncRequest.Builder().
-                    syncPeriodic(syncInterval, flexTime).
+                    syncPeriodic(PERIODIC_SYNC_INTERVAL, FLEX_TIME).
                     setSyncAdapter(account, authority).
                     setExtras(new Bundle()).build();
             ContentResolver.requestSync(request);
         } else {
             ContentResolver.addPeriodicSync(account,
-                    authority, new Bundle(), syncInterval);
+                    authority, new Bundle(), PERIODIC_SYNC_INTERVAL);
         }
     }
 

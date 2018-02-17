@@ -22,20 +22,24 @@
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             android:fitsSystemWindows="true">
-            <ImageView
-                android:id="@+id/ivLocationPicture"
+            <android.support.constraint.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/destination_card_height"
-                android:contentDescription="@string/image_placeholder"
-                android:transitionName="@string/shared_element_transition_id"
-                android:scaleType="centerCrop" />
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/ivLocationPicture"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/destination_card_height"
+                    android:contentDescription="@string/image_placeholder"
+                    android:transitionName="@string/shared_element_transition_id"
+                    android:scaleType="centerCrop" />
+            </android.support.constraint.ConstraintLayout>
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/tbLocationDetails"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:layout_collapseMode="pin">
-            </android.support.v7.widget.Toolbar>
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
     <android.support.v4.widget.NestedScrollView
@@ -47,25 +51,38 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <LinearLayout
+                android:id="@+id/llDirectionsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/destination_title_vertical_padding"
+                android:gravity="center_vertical"
                 android:paddingBottom="@dimen/destination_title_vertical_padding"
-                android:gravity="center_vertical">
+                android:paddingEnd="@dimen/activity_horizontal_margin"
+                android:paddingStart="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/destination_title_vertical_padding">
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:contentDescription="@string/address_icon"
                     android:layout_marginEnd="@dimen/destination_title_horizontal_padding"
+                    android:contentDescription="@string/address_icon"
                     android:src="@drawable/ic_address" />
+
                 <TextView
                     android:id="@+id/tvLocationAddress"
-                    android:layout_width="wrap_content"
                     style="@style/Base.TextAppearance.AppCompat.Subhead"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="@dimen/destination_title_horizontal_padding"
                     android:layout_height="wrap_content" />
+                <ImageButton
+                    android:id="@+id/ibDirections"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white_transparency"
+                    android:src="@drawable/ic_directions"
+                    />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -122,7 +139,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/no_comments" />
                 </LinearLayout>
-                </LinearLayout>
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:background="@color/light_grey"

@@ -14,9 +14,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -24,9 +26,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
+import com.google.gson.Gson;
 import com.nikogalla.tripbook.data.FirebaseHelper;
 import com.nikogalla.tripbook.data.LocationContract;
 import com.nikogalla.tripbook.data.LocationDbHelper;
+import com.nikogalla.tripbook.messaging.GcmSender;
 import com.nikogalla.tripbook.models.Comment;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.prefs.SettingsActivity;
@@ -54,9 +60,12 @@ public class LocationDetailsActivity extends AppCompatActivity {
     LinearLayout llComments;
     @BindView(R.id.llRates)
     LinearLayout llRates;
+    @BindView(R.id.ibDirections)
+    ImageButton ibDirections;
     FirebaseDatabase mDatabase;
     private String mLocationKey;
     Location mLocation;
+    FirebaseMessaging mFirebaseMessagingInstance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +75,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
         mContext = this;
         mDatabase = FirebaseHelper.getDatabase();
         mLocationKey = getIntent().getStringExtra(getString(R.string.location_key_id));
+        mFirebaseMessagingInstance = FirebaseMessaging.getInstance();
         String locationTitle = getIntent().getStringExtra(getString(R.string.location_name_id));
         setSupportActionBar(tbLocationDetails);;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -99,6 +109,12 @@ public class LocationDetailsActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+                ibDirections.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        attemptGoogleMapsLaunch();
+                    }
+                });
             }
 
             @Override
@@ -108,7 +124,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
             }
 
             @Override
@@ -146,14 +161,48 @@ public class LocationDetailsActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.current_location, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            supportFinishAfterTransition();
-            finish();
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                supportFinishAfterTransition();
+                finish();
+                return true;
+            case R.id.report:{
+                Log.v(TAG,"Location: " + mLocation.name + " reported");
+                reportLocationAsUnappropriate();
+                return true;
+            }
         }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    private void reportLocationAsUnappropriate(){
+        GcmSender.send(new Gson().toJson(mLocation));
+    }
+
+    public void attemptGoogleMapsLaunch(){
+        // Create a Uri from an intent string. Use the result to create an Intent.
+
+        Uri gmmIntentUri = Uri.parse("google.navigation:q="+ mLocation.latitude
+                +","+ mLocation.longitude+"");
+
+// Create an Intent from gmmIntentUri. Set the action to ACTION_VIEW
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+// Make the Intent explicit by setting the Google Maps package
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+// Attempt to start an activity that can handle the Intent
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }
 
     }
 }
