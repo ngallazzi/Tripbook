@@ -1,13 +1,10 @@
 package com.nikogalla.tripbook;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -18,24 +15,17 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
 import com.nikogalla.tripbook.data.FirebaseHelper;
-import com.nikogalla.tripbook.data.LocationContract;
-import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.messaging.GcmSender;
-import com.nikogalla.tripbook.models.Comment;
 import com.nikogalla.tripbook.models.Location;
-import com.nikogalla.tripbook.prefs.SettingsActivity;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;

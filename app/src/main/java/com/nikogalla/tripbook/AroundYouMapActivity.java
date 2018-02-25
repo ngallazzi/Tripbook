@@ -1,48 +1,31 @@
 package com.nikogalla.tripbook;
 
-import android.*;
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.ads.formats.NativeAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -54,21 +37,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nikogalla.tripbook.data.FirebaseHelper;
-import com.nikogalla.tripbook.data.LocationContract;
 import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
 import com.nikogalla.tripbook.utils.ImageUtils;
 import com.nikogalla.tripbook.utils.LocationUtils;
-import com.nikogalla.tripbook.utils.NetworkUtils;
 import com.nikogalla.tripbook.utils.StatusSnackBars;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -251,8 +224,6 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
                 if (currentLocation!=null){
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), MAP_ZOOM));
                     getLocations(currentLocation);
-                }else{
-                    StatusSnackBars.getErrorSnackBar(getString(R.string.alert_localization),clMapContainer,AroundYouMapActivity.this).show();
                 }
                 return;
             }
@@ -268,7 +239,7 @@ public class AroundYouMapActivity extends AppCompatActivity implements GoogleMap
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clMapContainer,AroundYouMapActivity.this).show();
+        StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clMapContainer).show();
     }
 
     private class TripBookInfoWindow implements GoogleMap.InfoWindowAdapter {

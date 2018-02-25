@@ -83,7 +83,7 @@ public class AddTagActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clActivityAddTagContainer,AddTagActivity.this).show();
+                StatusSnackBars.getErrorSnackBar(getString(R.string.database_error),clActivityAddTagContainer).show();
             }
         });
         ref.addListenerForSingleValueEvent(new ValueEventListener() {

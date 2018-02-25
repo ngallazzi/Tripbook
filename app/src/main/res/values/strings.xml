@@ -64,4 +64,5 @@
     <string name="share_text">I\'m visiting %1$s with Tripbook!</string>
     <string name="share_intent">Select how to share your location:</string>
     <string name="report">report</string>
+    <string name="name_hint">name</string>
 </resources>

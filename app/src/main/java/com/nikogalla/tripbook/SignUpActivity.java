@@ -1,16 +1,10 @@
 package com.nikogalla.tripbook;
 
-import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SyncRequest;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -21,12 +15,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.models.User;
-import com.nikogalla.tripbook.sync.TripbookSyncAdapter;
-import com.nikogalla.tripbook.utils.StatusSnackBars;
 
 import java.util.Arrays;
 
-public class SignUpActivity extends FragmentActivity {
+public class SignUpActivity extends AppCompatActivity {
     // Choose an arbitrary request code value
     private static final int RC_SIGN_IN = 123;
     private static final String TAG = SignUpActivity.class.getSimpleName();

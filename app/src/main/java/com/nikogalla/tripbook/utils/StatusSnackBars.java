@@ -27,15 +27,4 @@ public class StatusSnackBars {
         return snackbar;
     }
 
-    public static Snackbar getErrorSnackBar(String message, View attachedView, final Activity callingActivity){
-        final Snackbar snackbar = Snackbar.make(attachedView, message, Snackbar.LENGTH_INDEFINITE);
-        snackbar.setAction(callingActivity.getBaseContext().getString(R.string.settings), new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snackbar.dismiss();
-                callingActivity.startActivityForResult(new Intent(android.provider.Settings.ACTION_SETTINGS), 0);
-            }
-        });
-        return snackbar;
-    }
 }

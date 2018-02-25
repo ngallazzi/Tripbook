@@ -2,7 +2,6 @@ package com.nikogalla.tripbook.sync;
 
 
 import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
@@ -10,24 +9,15 @@ import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
-import android.view.View;
 
-import com.facebook.internal.Utility;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,7 +31,6 @@ import com.nikogalla.tripbook.data.LocationContract;
 import com.nikogalla.tripbook.data.LocationDbHelper;
 import com.nikogalla.tripbook.models.Location;
 import com.nikogalla.tripbook.utils.LocationUtils;
-import com.nikogalla.tripbook.utils.StatusSnackBars;
 
 import java.util.ArrayList;
 import java.util.Collections;
