@@ -23,7 +23,7 @@ public class StatusSnackBars {
     }
 
     public static Snackbar getErrorSnackBar(String message, View attachedView){
-        final Snackbar snackbar = Snackbar.make(attachedView, message, Snackbar.LENGTH_LONG);
+        final Snackbar snackbar = Snackbar.make(attachedView, message, Snackbar.LENGTH_INDEFINITE);
         return snackbar;
     }
 

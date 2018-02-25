@@ -56,6 +56,10 @@ dependencies {
     compile 'com.google.firebase:firebase-database:11.8.0'
     compile 'com.google.firebase:firebase-messaging:11.8.0'
     compile 'com.google.firebase:firebase-storage:11.8.0'
+    // permissions
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.10'
+    compile 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.5@aar'
     // Butterknife
     compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
